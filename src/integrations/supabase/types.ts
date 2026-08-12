@@ -97,6 +97,30 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          contact_email: string
+          created_at: string
+          id: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          contact_email?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Update: {
+          contact_email?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_id: string | null
