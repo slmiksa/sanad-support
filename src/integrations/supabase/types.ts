@@ -320,11 +320,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_company_access: { Args: { _company_id: string }; Returns: Json }
+      admin_list_platform_agents: { Args: never; Returns: Json }
+      admin_provision_member: {
+        Args: {
+          _company_id: string
+          _department?: string
+          _email: string
+          _employee_no?: string
+          _extension?: string
+          _full_name: string
+          _phone?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _specialty?: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      admin_remove_platform_agent: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       can_platform_support: {
         Args: { _company_id: string; _user_id: string }
         Returns: boolean
       }
       current_company_id: { Args: never; Returns: string }
+      get_public_company: { Args: { _slug: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -338,6 +360,7 @@ export type Database = {
       }
       is_platform_agent: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      track_ticket_public: { Args: { _ticket_no: string }; Returns: Json }
     }
     Enums: {
       app_role:
