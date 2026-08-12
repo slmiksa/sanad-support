@@ -25,6 +25,7 @@ import {
   type FieldItem,
 } from "@/lib/company-settings";
 import { useAccess } from "@/lib/use-access";
+import { CompanyReports } from "@/components/CompanyReports";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
   head: () => ({
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
   component: CompanyAdminPage,
 });
 
-type Tab = "tickets" | "settings" | "users";
+type Tab = "tickets" | "reports" | "settings" | "users";
 
 function CompanyAdminPage() {
   const { slug } = Route.useParams();
@@ -354,6 +355,7 @@ function CompanyAdminPage() {
           {(
             [
               ["tickets", "التذاكر"],
+              ["reports", "التقارير"],
               ["settings", "التخصيص والحقول"],
               ["users", "العضويات"],
             ] as [Tab, string][]
