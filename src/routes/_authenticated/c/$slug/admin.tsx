@@ -430,23 +430,80 @@ function CompanyAdminPage() {
               </select>
             </div>
 
-            <div className="space-y-6">
-              <MembersSection
-                title="العضويات الإدارية"
-                hint="مشرفو لوحة التحكم — صلاحية كاملة على التذاكر والإعدادات."
-                rows={(members.data ?? []).filter((m) => m.role === "company_admin")}
-              />
-              <MembersSection
-                title="موظفو الشركة"
-                hint="يرفعون التذاكر ويتابعون سجلهم الخاص فقط."
-                rows={(members.data ?? []).filter((m) => m.role === "employee")}
-              />
-              <MembersSection
-                title="فريق الدعم الفني"
-                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
-                rows={(members.data ?? []).filter((m) => m.role === "agent")}
-              />
+            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+              <table className="w-full text-right text-sm">
+                <thead className="bg-muted/60 text-xs text-muted-foreground">
+                  <tr>
+                    <th className="p-3">رقم التذكرة</th>
+                    <th className="p-3">العنوان</th>
+                    <th className="p-3">مقدّم الطلب</th>
+                    <th className="p-3">الفرع</th>
+                    <th className="p-3">الأهمية</th>
+                    <th className="p-3">الحالة</th>
+                    <th className="p-3">التاريخ</th>
+                    <th className="p-3">إجراء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((t) => (
+                    <tr key={t.id} className="border-t border-border">
+                      <td className="p-3 text-xs font-bold" dir="ltr">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="text-primary hover:underline"
+                        >
+                          {t.ticket_no}
+                        </Link>
+                      </td>
+                      <td className="p-3 font-bold">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="hover:underline"
+                        >
+                          {t.title}
+                        </Link>
+                      </td>
+                      <td className="p-3 text-xs">{t.requester_name || "—"}</td>
+                      <td className="p-3 text-xs">{t.branch || "—"}</td>
+                      <td className="p-3 text-xs">
+                        {PRIORITY_META[t.priority as Priority]?.label ?? t.priority}
+                      </td>
+                      <td className="p-3 text-xs">
+                        {STATUS_META[t.status as Status]?.label ?? t.status}
+                      </td>
+                      <td className="p-3 text-xs">
+                        {new Date(t.created_at).toLocaleDateString("ar-SA-u-ca-gregory")}
+                      </td>
+                      <td className="p-3">
+                        <select
+                          className="field h-9 w-auto py-1 text-xs"
+                          value={t.status}
+                          onChange={(e) =>
+                            setTicketStatus.mutate({ id: t.id, next: e.target.value as Status })
+                          }
+                        >
+                          {(Object.keys(STATUS_META) as Status[]).map((s) => (
+                            <option key={s} value={s}>
+                              {STATUS_META[s].label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                  {rows.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                        {tickets.isLoading ? "جارِ التحميل…" : "لا توجد تذاكر."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
+
           </>
         )}
 
