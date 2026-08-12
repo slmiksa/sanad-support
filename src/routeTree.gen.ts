@@ -17,6 +17,7 @@ import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated
 import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
+import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const AuthenticatedCSlugAdminRoute = AuthenticatedCSlugAdminRouteImport.update({
   path: '/c/$slug/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCSlugMeRoute = AuthenticatedCSlugMeRouteImport.update({
+  id: '/c/$slug/me',
+  path: '/c/$slug/me',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
+  '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
+  '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
+  '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/c/$slug/admin'
+    | '/c/$slug/me'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/c/$slug/track'
     | '/c/$slug'
     | '/c/$slug/admin'
+    | '/c/$slug/me'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
+    | '/_authenticated/c/$slug/me'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCSlugAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/c/$slug/me': {
+      id: '/_authenticated/c/$slug/me'
+      path: '/c/$slug/me'
+      fullPath: '/c/$slug/me'
+      preLoaderRoute: typeof AuthenticatedCSlugMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -191,12 +210,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedCSlugAdminRoute: typeof AuthenticatedCSlugAdminRoute
+  AuthenticatedCSlugMeRoute: typeof AuthenticatedCSlugMeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedCSlugAdminRoute: AuthenticatedCSlugAdminRoute,
+  AuthenticatedCSlugMeRoute: AuthenticatedCSlugMeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

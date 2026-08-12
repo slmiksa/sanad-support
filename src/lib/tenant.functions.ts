@@ -9,7 +9,7 @@ export const getCompanyBySlug = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: company } = await supabaseAdmin
       .from("companies")
-      .select("id, slug, name, tagline, logo_url, primary_color, secondary_color, is_active")
+      .select("id, slug, name, tagline, logo_url, primary_color, secondary_color, is_active, form_fields")
       .eq("slug", data.slug)
       .maybeSingle();
     if (!company || !company.is_active) return null;

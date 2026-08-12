@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { getCompanyBySlug, submitTicket } from "@/lib/tenant.functions";
 import { PRIORITY_META, type Priority } from "@/lib/tickets";
 import { TicketTracker } from "@/components/TicketTracker";
+import { parseFields } from "@/lib/company-settings";
 
 export const Route = createFileRoute("/c/$slug/")({
   loader: async ({ params }) => {
@@ -49,6 +50,7 @@ function TenantPortal() {
   const { company, branches } = Route.useLoaderData();
   const { slug } = Route.useParams();
   const submit = useServerFn(submitTicket);
+  const fields = parseFields(company.form_fields);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -136,40 +138,44 @@ function TenantPortal() {
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">الفرع</span>
-              <select
-                className="field"
-                value={form.branch}
-                onChange={(e) => setForm({ ...form, branch: e.target.value })}
-              >
-                <option value="">غير محدد</option>
-                {branches.map((b: { id: string; name: string }) => (
-                  <option key={b.id} value={b.name}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">الأهمية</span>
-              <div className="flex gap-2">
-                {(Object.keys(PRIORITY_META) as Priority[]).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setForm({ ...form, priority: p })}
-                    className={`flex-1 rounded-xl border px-2 py-2 text-xs font-bold transition ${
-                      form.priority === p
-                        ? PRIORITY_META[p].className
-                        : "border-border bg-muted/40 text-muted-foreground"
-                    }`}
-                  >
-                    {PRIORITY_META[p].icon} {PRIORITY_META[p].label}
-                  </button>
-                ))}
+            {fields.branch && (
+              <label className="block space-y-1.5">
+                <span className="text-xs font-bold text-muted-foreground">الفرع</span>
+                <select
+                  className="field"
+                  value={form.branch}
+                  onChange={(e) => setForm({ ...form, branch: e.target.value })}
+                >
+                  <option value="">غير محدد</option>
+                  {branches.map((b: { id: string; name: string }) => (
+                    <option key={b.id} value={b.name}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {fields.priority && (
+              <div className="space-y-1.5">
+                <span className="text-xs font-bold text-muted-foreground">الأهمية</span>
+                <div className="flex gap-2">
+                  {(Object.keys(PRIORITY_META) as Priority[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setForm({ ...form, priority: p })}
+                      className={`flex-1 rounded-xl border px-2 py-2 text-xs font-bold transition ${
+                        form.priority === p
+                          ? PRIORITY_META[p].className
+                          : "border-border bg-muted/40 text-muted-foreground"
+                      }`}
+                    >
+                      {PRIORITY_META[p].icon} {PRIORITY_META[p].label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -182,26 +188,31 @@ function TenantPortal() {
                 onChange={(e) => setForm({ ...form, requester_name: e.target.value })}
               />
             </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">الجوال</span>
-              <input
-                dir="ltr"
-                className="field"
-                value={form.requester_phone}
-                onChange={(e) => setForm({ ...form, requester_phone: e.target.value })}
-              />
-            </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">البريد</span>
-              <input
-                dir="ltr"
-                type="email"
-                className="field"
-                value={form.requester_email}
-                onChange={(e) => setForm({ ...form, requester_email: e.target.value })}
-              />
-            </label>
+            {fields.phone && (
+              <label className="block space-y-1.5">
+                <span className="text-xs font-bold text-muted-foreground">الجوال</span>
+                <input
+                  dir="ltr"
+                  className="field"
+                  value={form.requester_phone}
+                  onChange={(e) => setForm({ ...form, requester_phone: e.target.value })}
+                />
+              </label>
+            )}
+            {fields.email && (
+              <label className="block space-y-1.5">
+                <span className="text-xs font-bold text-muted-foreground">البريد</span>
+                <input
+                  dir="ltr"
+                  type="email"
+                  className="field"
+                  value={form.requester_email}
+                  onChange={(e) => setForm({ ...form, requester_email: e.target.value })}
+                />
+              </label>
+            )}
           </div>
+
 
           <button
             disabled={busy}
