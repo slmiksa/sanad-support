@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   Building2,
@@ -59,7 +58,6 @@ function SuperAdminPage() {
   const access = useAccess();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const create = useServerFn(createCompany);
   const [form, setForm] = useState(empty);
   const [open, setOpen] = useState(false);
   const [detailsId, setDetailsId] = useState<string | null>(null);
@@ -70,26 +68,22 @@ function SuperAdminPage() {
     admin_email: string;
     admin_password: string;
   } | null>(null);
-  const fetchAccess = useServerFn(getCompanyAccess);
-  const resetPassword = useServerFn(resetMemberPassword);
 
   const details = useQuery({
     queryKey: ["company-access", detailsId],
     enabled: !!detailsId,
-    queryFn: () => fetchAccess({ data: { company_id: detailsId! } }),
+    queryFn: () => getCompanyAccess({ data: { company_id: detailsId! } }),
   });
 
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
 
   const resetMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const password = generatePassword();
-      await resetPassword({ data: { user_id: userId, password } });
-      return { userId, password };
+    mutationFn: async (email: string) => {
+      await resetMemberPassword({ data: { email } });
+      return email;
     },
-    onSuccess: ({ userId, password }) => {
-      setNewPasswords((prev) => ({ ...prev, [userId]: password }));
-      toast.success("تم تعيين كلمة مرور جديدة", { description: password });
+    onSuccess: (email) => {
+      toast.success("تم إرسال رابط إعادة تعيين كلمة المرور", { description: email });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -108,7 +102,7 @@ function SuperAdminPage() {
 
   const mutation = useMutation({
     mutationFn: async () =>
-      create({
+      createCompany({
         data: {
           ...form,
           branches: form.branches
@@ -415,19 +409,13 @@ function SuperAdminPage() {
                           </td>
                           <td className="p-2">{ROLE_LABEL[m.role] ?? m.role}</td>
                           <td className="p-2">
-                            {newPasswords[m.user_id] ? (
-                              <span className="font-mono" dir="ltr">
-                                {newPasswords[m.user_id]}
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => resetMutation.mutate(m.user_id)}
-                                disabled={resetMutation.isPending}
-                                className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold"
-                              >
-                                <KeyRound className="h-3 w-3" /> توليد كلمة مرور
-                              </button>
-                            )}
+                            <button
+                              onClick={() => resetMutation.mutate(m.email)}
+                              disabled={resetMutation.isPending || !m.email}
+                              className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold"
+                            >
+                              <KeyRound className="h-3 w-3" /> إرسال رابط إعادة التعيين
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -435,8 +423,7 @@ function SuperAdminPage() {
                   </table>
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  كلمات المرور مشفّرة ولا يمكن استرجاعها؛ استخدم «توليد كلمة مرور» لإصدار كلمة جديدة
-                  وتسليمها للعميل.
+                  كلمات المرور مشفّرة ولا يمكن استرجاعها؛ يصل للعضو رابط لتعيين كلمة مرور جديدة على بريده.
                 </p>
               </>
             )}
@@ -690,22 +677,19 @@ function PlatformContactCard() {
 function PlatformStaffCard() {
   const qc = useQueryClient();
   const access = useAccess();
-  const listAgents = useServerFn(listPlatformAgents);
-  const addAgent = useServerFn(createPlatformAgent);
-  const delAgent = useServerFn(removePlatformAgent);
   const [form, setForm] = useState({ full_name: "", email: "", password: "", phone: "" });
   const [open, setOpen] = useState(false);
 
   const agents = useQuery({
     queryKey: ["platform-agents"],
-    queryFn: () => listAgents(),
+    queryFn: () => listPlatformAgents(),
     enabled: access.isSuperAdmin,
     retry: false,
   });
 
 
   const create = useMutation({
-    mutationFn: async () => addAgent({ data: form }),
+    mutationFn: async () => createPlatformAgent({ data: form }),
     onSuccess: (res) => {
       toast.success("تم إنشاء عضوية فني دعم المنصة", {
         description: `${res.email} — ${res.password}`,
@@ -718,7 +702,7 @@ function PlatformStaffCard() {
   });
 
   const remove = useMutation({
-    mutationFn: async (user_id: string) => delAgent({ data: { user_id } }),
+    mutationFn: async (user_id: string) => removePlatformAgent({ data: { user_id } }),
     onSuccess: () => {
       toast.success("تم حذف العضوية");
       void qc.invalidateQueries({ queryKey: ["platform-agents"] });

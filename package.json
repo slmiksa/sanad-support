@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:static": "env -u DEV_SERVER__PROJECT_PATH -u LOVABLE_SANDBOX vite build --config vite.selfhost.config.ts && node scripts/finalize-static.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
