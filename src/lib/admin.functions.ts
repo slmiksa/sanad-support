@@ -123,6 +123,11 @@ export const createCompanyMember = createServerFn({ method: "POST" })
       company_id: data.company_id,
       full_name: data.full_name,
       email: data.email,
+      employee_no: data.employee_no || null,
+      extension: data.extension || null,
+      specialty: data.specialty || null,
+      department: data.department || null,
+      phone: data.phone || null,
     });
     await supabaseAdmin
       .from("user_roles")
