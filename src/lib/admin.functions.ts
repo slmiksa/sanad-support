@@ -89,10 +89,16 @@ export const createCompanyMember = createServerFn({ method: "POST" })
         full_name: z.string().min(2).max(120),
         email: z.string().email().max(160),
         password: z.string().min(8).max(72),
+        employee_no: z.string().max(40).optional().default(""),
+        extension: z.string().max(20).optional().default(""),
+        specialty: z.string().max(120).optional().default(""),
+        department: z.string().max(120).optional().default(""),
+        phone: z.string().max(30).optional().default(""),
         role: z.enum(["company_admin", "agent", "employee"]),
       })
       .parse(input),
   )
+
   .handler(async ({ data, context }) => {
     const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
       _user_id: context.userId,
@@ -117,6 +123,11 @@ export const createCompanyMember = createServerFn({ method: "POST" })
       company_id: data.company_id,
       full_name: data.full_name,
       email: data.email,
+      employee_no: data.employee_no || null,
+      extension: data.extension || null,
+      specialty: data.specialty || null,
+      department: data.department || null,
+      phone: data.phone || null,
     });
     await supabaseAdmin
       .from("user_roles")

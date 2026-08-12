@@ -3,11 +3,26 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, LogOut, Plus, Save, Trash2, Users } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Loader2,
+  LogOut,
+  Plus,
+  Save,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { createCompanyMember } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
-import { DEFAULT_FIELDS, FIELD_LABELS, parseFields, type FormFields } from "@/lib/company-settings";
+import {
+  buildFieldConfig,
+  fieldsFromConfig,
+  newCustomKey,
+  type CustomFieldType,
+  type FieldItem,
+} from "@/lib/company-settings";
 import { useAccess } from "@/lib/use-access";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
@@ -20,6 +35,8 @@ export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
       },
       { property: "og:title", content: "لوحة تحكم تذاكر الشركة" },
       { property: "og:description", content: "إدارة كاملة لتذاكر الدعم الفني داخل شركتك." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CompanyAdminPage,
@@ -37,10 +54,18 @@ function CompanyAdminPage() {
   const [priority, setPriority] = useState<Priority | "all">("all");
   const [status, setStatus] = useState<Status | "all">("all");
   const [branchName, setBranchName] = useState("");
+  const [newField, setNewField] = useState<{ label: string; type: CustomFieldType; options: string }>(
+    { label: "", type: "text", options: "" },
+  );
   const [member, setMember] = useState({
     full_name: "",
     email: "",
     password: "",
+    employee_no: "",
+    extension: "",
+    specialty: "",
+    department: "",
+    phone: "",
     role: "employee" as "company_admin" | "agent" | "employee",
   });
   const [settings, setSettings] = useState<{
@@ -48,15 +73,18 @@ function CompanyAdminPage() {
     logo_url: string;
     primary_color: string;
     secondary_color: string;
-    form_fields: FormFields;
+    fields: FieldItem[];
   } | null>(null);
+
 
   const company = useQuery({
     queryKey: ["company", slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields")
+        .select(
+          "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config",
+        )
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -66,9 +94,10 @@ function CompanyAdminPage() {
           logo_url: data.logo_url ?? "",
           primary_color: data.primary_color,
           secondary_color: data.secondary_color,
-          form_fields: parseFields(data.form_fields),
+          fields: buildFieldConfig(data.form_fields, data.field_config),
         });
       }
+
       return data;
     },
   });
@@ -108,7 +137,10 @@ function CompanyAdminPage() {
     enabled: !!companyId,
     queryFn: async () => {
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email").eq("company_id", companyId!),
+        supabase
+          .from("profiles")
+          .select("id, full_name, email, employee_no, extension, specialty, department")
+          .eq("company_id", companyId!),
         supabase.from("user_roles").select("user_id, role").eq("company_id", companyId!),
       ]);
       return (profiles ?? []).map((p) => ({
@@ -147,7 +179,9 @@ function CompanyAdminPage() {
           logo_url: settings.logo_url || null,
           primary_color: settings.primary_color,
           secondary_color: settings.secondary_color,
-          form_fields: settings.form_fields,
+          form_fields: fieldsFromConfig(settings.fields),
+          field_config: settings.fields,
+
         })
         .eq("id", companyId);
       if (error) throw error;
@@ -186,7 +220,18 @@ function CompanyAdminPage() {
     mutationFn: async () => addMember({ data: { company_id: companyId!, ...member } }),
     onSuccess: () => {
       toast.success("تم إنشاء الحساب");
-      setMember({ full_name: "", email: "", password: "", role: "employee" });
+      setMember({
+        full_name: "",
+        email: "",
+        password: "",
+        employee_no: "",
+        extension: "",
+        specialty: "",
+        department: "",
+        phone: "",
+        role: "employee",
+      });
+
       void qc.invalidateQueries({ queryKey: ["members", companyId] });
     },
     onError: (e: Error) => toast.error("تعذّر الإنشاء", { description: e.message }),
@@ -235,7 +280,51 @@ function CompanyAdminPage() {
     );
   }
 
-  const fields = settings?.form_fields ?? DEFAULT_FIELDS;
+  const fields = settings?.fields ?? [];
+
+  const moveField = (index: number, dir: -1 | 1) => {
+    if (!settings) return;
+    const next = [...settings.fields];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    setSettings({ ...settings, fields: next });
+  };
+
+  const updateField = (index: number, patch: Partial<FieldItem>) => {
+    if (!settings) return;
+    const next = settings.fields.map((f, i) => (i === index ? { ...f, ...patch } : f));
+    setSettings({ ...settings, fields: next });
+  };
+
+  const removeField = (index: number) => {
+    if (!settings) return;
+    setSettings({ ...settings, fields: settings.fields.filter((_, i) => i !== index) });
+  };
+
+  const addCustomField = () => {
+    if (!settings || !newField.label.trim()) return;
+    setSettings({
+      ...settings,
+      fields: [
+        ...settings.fields,
+        {
+          key: newCustomKey(),
+          label: newField.label.trim(),
+          enabled: true,
+          custom: true,
+          type: newField.type,
+          required: false,
+          options: newField.options
+            .split(",")
+            .map((o) => o.trim())
+            .filter(Boolean),
+        },
+      ],
+    });
+    setNewField({ label: "", type: "text", options: "" });
+  };
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -353,9 +442,24 @@ function CompanyAdminPage() {
                   {rows.map((t) => (
                     <tr key={t.id} className="border-t border-border">
                       <td className="p-3 font-mono text-xs" dir="ltr">
-                        {t.ticket_no}
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="text-primary hover:underline"
+                        >
+                          {t.ticket_no}
+                        </Link>
                       </td>
-                      <td className="p-3 font-bold">{t.title}</td>
+                      <td className="p-3 font-bold">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="hover:text-primary hover:underline"
+                        >
+                          {t.title}
+                        </Link>
+                      </td>
+
                       <td className="p-3 text-xs text-muted-foreground">{t.branch}</td>
                       <td className="p-3">
                         <span
@@ -441,26 +545,130 @@ function CompanyAdminPage() {
 
               <h3 className="pt-2 text-sm font-black">حقول نموذج التذكرة</h3>
               <div className="space-y-2">
-                {(Object.keys(FIELD_LABELS) as (keyof FormFields)[]).map((key) => (
-                  <label
-                    key={key}
-                    className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-xs font-bold"
+                {fields.map((f, i) => (
+                  <div
+                    key={f.key}
+                    className="rounded-xl border border-border px-3 py-2 text-xs font-bold"
                   >
-                    {FIELD_LABELS[key]}
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-[var(--color-primary)]"
-                      checked={fields[key]}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          form_fields: { ...fields, [key]: e.target.checked },
-                        })
-                      }
-                    />
-                  </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        aria-label={`تفعيل ${f.label}`}
+                        className="h-4 w-4 accent-[var(--color-primary)]"
+                        checked={f.enabled}
+                        onChange={(e) => updateField(i, { enabled: e.target.checked })}
+                      />
+                      {f.custom ? (
+                        <input
+                          className="field h-9 flex-1 py-1 text-xs"
+                          value={f.label}
+                          onChange={(e) => updateField(i, { label: e.target.value })}
+                        />
+                      ) : (
+                        <span className="flex-1">{f.label}</span>
+                      )}
+                      <button
+                        type="button"
+                        aria-label="تحريك لأعلى"
+                        onClick={() => moveField(i, -1)}
+                        className="grid h-8 w-8 place-items-center rounded-lg border border-border disabled:opacity-30"
+                        disabled={i === 0}
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="تحريك لأسفل"
+                        onClick={() => moveField(i, 1)}
+                        className="grid h-8 w-8 place-items-center rounded-lg border border-border disabled:opacity-30"
+                        disabled={i === fields.length - 1}
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </button>
+                      {f.custom && (
+                        <button
+                          type="button"
+                          aria-label={`حذف ${f.label}`}
+                          onClick={() => removeField(i)}
+                          className="grid h-8 w-8 place-items-center rounded-lg border border-border text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    {f.custom && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-normal">
+                        <select
+                          className="field h-9 w-auto py-1 text-xs"
+                          value={f.type}
+                          onChange={(e) =>
+                            updateField(i, { type: e.target.value as CustomFieldType })
+                          }
+                        >
+                          <option value="text">نص قصير</option>
+                          <option value="textarea">نص طويل</option>
+                          <option value="number">رقم</option>
+                          <option value="select">قائمة اختيار</option>
+                        </select>
+                        {f.type === "select" && (
+                          <input
+                            className="field h-9 flex-1 py-1 text-xs"
+                            placeholder="الخيارات مفصولة بفاصلة"
+                            value={f.options.join("، ")}
+                            onChange={(e) =>
+                              updateField(i, {
+                                options: e.target.value
+                                  .split(/[،,]/)
+                                  .map((o) => o.trim())
+                                  .filter(Boolean),
+                              })
+                            }
+                          />
+                        )}
+                        <label className="flex items-center gap-1">
+                          <input
+                            type="checkbox"
+                            className="h-3.5 w-3.5 accent-[var(--color-primary)]"
+                            checked={f.required}
+                            onChange={(e) => updateField(i, { required: e.target.checked })}
+                          />
+                          إلزامي
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
+
+              <div className="flex flex-wrap gap-2 rounded-xl border border-dashed border-border p-3">
+                <input
+                  className="field h-10 flex-1 py-1 text-xs"
+                  placeholder="اسم حقل جديد"
+                  value={newField.label}
+                  onChange={(e) => setNewField({ ...newField, label: e.target.value })}
+                />
+                <select
+                  className="field h-10 w-auto py-1 text-xs"
+                  value={newField.type}
+                  onChange={(e) =>
+                    setNewField({ ...newField, type: e.target.value as CustomFieldType })
+                  }
+                >
+                  <option value="text">نص قصير</option>
+                  <option value="textarea">نص طويل</option>
+                  <option value="number">رقم</option>
+                  <option value="select">قائمة اختيار</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={addCustomField}
+                  aria-label="إضافة حقل"
+                  className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+
 
               <button
                 onClick={() => saveSettings.mutate()}
@@ -553,6 +761,38 @@ function CompanyAdminPage() {
                 value={member.password}
                 onChange={(e) => setMember({ ...member, password: e.target.value })}
               />
+              <input
+                className="field"
+                placeholder="الرقم الوظيفي"
+                value={member.employee_no}
+                onChange={(e) => setMember({ ...member, employee_no: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="التحويلة"
+                value={member.extension}
+                onChange={(e) => setMember({ ...member, extension: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="التخصص"
+                value={member.specialty}
+                onChange={(e) => setMember({ ...member, specialty: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="القسم"
+                value={member.department}
+                onChange={(e) => setMember({ ...member, department: e.target.value })}
+              />
+              <input
+                dir="ltr"
+                className="field"
+                placeholder="الجوال"
+                value={member.phone}
+                onChange={(e) => setMember({ ...member, phone: e.target.value })}
+              />
+
               <div className="flex gap-2">
                 <select
                   className="field"
@@ -584,6 +824,9 @@ function CompanyAdminPage() {
                   <tr>
                     <th className="p-3">الاسم</th>
                     <th className="p-3">البريد</th>
+                    <th className="p-3">الرقم الوظيفي</th>
+                    <th className="p-3">التحويلة</th>
+                    <th className="p-3">التخصص</th>
                     <th className="p-3">الصلاحية</th>
                   </tr>
                 </thead>
@@ -594,6 +837,9 @@ function CompanyAdminPage() {
                       <td className="p-3 text-xs" dir="ltr">
                         {m.email}
                       </td>
+                      <td className="p-3 text-xs">{m.employee_no || "—"}</td>
+                      <td className="p-3 text-xs">{m.extension || "—"}</td>
+                      <td className="p-3 text-xs">{m.specialty || "—"}</td>
                       <td className="p-3 text-xs">
                         {m.role === "company_admin"
                           ? "مشرف لوحة التحكم"
@@ -605,7 +851,7 @@ function CompanyAdminPage() {
                   ))}
                   {(members.data ?? []).length === 0 && (
                     <tr>
-                      <td colSpan={3} className="p-8 text-center text-muted-foreground">
+                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
                         لا توجد عضويات بعد.
                       </td>
                     </tr>
