@@ -10,6 +10,7 @@ export type Access = {
   companyName: string | null;
   companyId: string | null;
   role: string | null;
+  fullName: string | null;
 };
 
 export function useAccess(): Access {
@@ -21,6 +22,7 @@ export function useAccess(): Access {
     companyName: null,
     companyId: null,
     role: null,
+    fullName: null,
   });
 
   useEffect(() => {
@@ -39,12 +41,13 @@ export function useAccess(): Access {
             companyName: null,
             companyId: null,
             role: null,
+            fullName: null,
           });
         return;
       }
       const [{ data: roles }, { data: profile }] = await Promise.all([
         supabase.from("user_roles").select("role, company_id").eq("user_id", user.id),
-        supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("company_id, full_name").eq("id", user.id).maybeSingle(),
       ]);
       const isSuperAdmin = (roles ?? []).some((r) => r.role === "super_admin");
       const companyId = profile?.company_id ?? null;
@@ -68,6 +71,10 @@ export function useAccess(): Access {
           companyName,
           companyId,
           role: (roles ?? [])[0]?.role ?? null,
+          fullName:
+            profile?.full_name?.trim() ||
+            (user.user_metadata?.["full_name"] as string | undefined) ||
+            null,
         });
     };
 

@@ -160,7 +160,7 @@ function CompanyAdminPage() {
       await supabase.from("ticket_updates").insert({
         ticket_id: id,
         author_id: access.user?.id ?? null,
-        author_name: access.user?.email ?? "فريق الدعم",
+        author_name: access.fullName || "فريق الدعم",
         note: `تم تغيير الحالة إلى: ${STATUS_META[next].label}`,
         status: next,
       });
