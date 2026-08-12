@@ -128,8 +128,9 @@ function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <span className="flex items-center gap-2 font-black text-primary">
-            <Sparkles className="h-5 w-5" /> منصة التذاكر
+          <span className="flex items-center gap-3 font-black text-primary">
+            <img src={sanadLogo.url} alt="شعار نظام سند" className="h-10 w-auto" />
+            نظام سند للدعم الفني
           </span>
           <a
             href="#contact"
@@ -142,9 +143,11 @@ function LandingPage() {
 
       <main>
         <section className="mx-auto max-w-6xl px-4 py-16">
+          <img src={sanadLogo.url} alt="شعار نظام سند" className="mb-6 h-24 w-auto" />
           <h1 className="max-w-3xl text-3xl font-black leading-tight sm:text-5xl">
-            نظام تذاكر دعم فني <span className="text-primary">White-Label</span> لكل شركة
+            <span className="text-primary">نظام سند</span> للدعم الفني لكل شركة
           </h1>
+
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             منصة واحدة تدير الدعم الفني لعدة شركات في آنٍ معاً. لكل شركة مسار مستقل وهوية بصرية
             خاصة ولوحة تحكم كاملة: تتحكم بحقول نموذج التذكرة وترتيبها، وتنشئ عضويات مشرفين للوحة
