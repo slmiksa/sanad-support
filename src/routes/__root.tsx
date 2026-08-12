@@ -125,8 +125,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandingProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        <div className="flex min-h-screen flex-col">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <SiteFooter />
+        </div>
         <Toaster position="top-center" richColors dir="rtl" />
       </BrandingProvider>
     </QueryClientProvider>
