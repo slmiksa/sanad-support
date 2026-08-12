@@ -17,27 +17,36 @@ import {
   Search,
 } from "lucide-react";
 import { usePlatformSettings, whatsappLink } from "@/lib/platform";
+import sanadLogo from "@/assets/sanad-logo.png.asset.json";
+
+const SITE_ORIGIN = "https://project--0ea35464-4366-4fbb-82c3-d3352d37ad72.lovable.app";
+const LOGO_URL = `${SITE_ORIGIN}${sanadLogo.url}`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "منصة تذاكر الدعم الفني للشركات | White-Label SaaS" },
+      { title: "نظام سند - للدعم الفني" },
       {
         name: "description",
         content:
-          "منصة تذاكر دعم فني متعددة الشركات: مسار مستقل لكل شركة، تخصيص الحقول والألوان، عضويات مشرفين وموظفين، وعزل كامل للبيانات. اطلب الخدمة عبر واتساب أو البريد.",
+          "نظام سند للدعم الفني: منصة تذاكر متعددة الشركات، مسار مستقل لكل شركة، تخصيص الحقول والهوية، عضويات مشرفين وموظفين، وعزل كامل للبيانات.",
       },
-      { property: "og:title", content: "منصة تذاكر الدعم الفني للشركات" },
+      { property: "og:title", content: "نظام سند - للدعم الفني" },
       {
         property: "og:description",
         content: "بوابة تذاكر مخصصة لكل شركة مع لوحة تحكم وإدارة عضويات واشتراكات مركزية.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+      { property: "og:image", content: LOGO_URL },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: LOGO_URL },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: LandingPage,
 });
+
 
 const FEATURES = [
   {
