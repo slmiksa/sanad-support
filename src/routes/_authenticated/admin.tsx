@@ -7,6 +7,7 @@ import { Building2, Loader2, LogOut, Plus, ExternalLink, Download, KeyRound, Inf
 import { supabase } from "@/integrations/supabase/client";
 import { createCompany, getCompanyAccess, resetMemberPassword } from "@/lib/admin.functions";
 import { useAccess } from "@/lib/use-access";
+import { usePlatformSettings } from "@/lib/platform";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -166,6 +167,8 @@ function SuperAdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+        <PlatformContactCard />
+
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
           <button
@@ -175,6 +178,7 @@ function SuperAdminPage() {
             <Plus className="h-4 w-4" /> شركة جديدة
           </button>
         </div>
+
 
         {open && (
           <form
@@ -558,5 +562,76 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
       <span className="text-xs font-bold text-muted-foreground">{label}</span>
       {children}
     </label>
+  );
+}
+
+function PlatformContactCard() {
+  const qc = useQueryClient();
+  const settings = usePlatformSettings();
+  const [form, setForm] = useState<{ contact_email: string; whatsapp: string } | null>(null);
+  const current = form ?? {
+    contact_email: settings.data?.contact_email ?? "",
+    whatsapp: settings.data?.whatsapp ?? "",
+  };
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!settings.data?.id) throw new Error("لا توجد إعدادات");
+      const { error } = await supabase
+        .from("platform_settings")
+        .update({ contact_email: current.contact_email, whatsapp: current.whatsapp })
+        .eq("id", settings.data.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم حفظ بيانات التواصل");
+      void qc.invalidateQueries({ queryKey: ["platform-settings"] });
+    },
+    onError: (e: Error) => toast.error("تعذّر الحفظ", { description: e.message }),
+  });
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-5">
+      <h2 className="text-base font-black">بيانات التواصل في الصفحة الرئيسية</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        تظهر هذه البيانات في أزرار «اطلب الخدمة» بالصفحة الرئيسية.
+      </p>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+        className="mt-4 grid gap-4 sm:grid-cols-3"
+      >
+        <F label="البريد الإلكتروني">
+          <input
+            required
+            type="email"
+            dir="ltr"
+            className="field"
+            value={current.contact_email}
+            onChange={(e) => setForm({ ...current, contact_email: e.target.value })}
+          />
+        </F>
+        <F label="رقم واتساب (بصيغة دولية)">
+          <input
+            required
+            dir="ltr"
+            className="field"
+            placeholder="966500000000"
+            value={current.whatsapp}
+            onChange={(e) => setForm({ ...current, whatsapp: e.target.value })}
+          />
+        </F>
+        <div className="flex items-end">
+          <button
+            disabled={save.isPending}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground disabled:opacity-60"
+          >
+            {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} حفظ
+          </button>
+        </div>
+      </form>
+    </section>
   );
 }
