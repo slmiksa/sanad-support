@@ -6,6 +6,7 @@ export type Access = {
   user: User | null;
   loading: boolean;
   isSuperAdmin: boolean;
+  isPlatformAgent: boolean;
   companySlug: string | null;
   companyName: string | null;
   companyId: string | null;
@@ -18,6 +19,7 @@ export function useAccess(): Access {
     user: null,
     loading: true,
     isSuperAdmin: false,
+    isPlatformAgent: false,
     companySlug: null,
     companyName: null,
     companyId: null,
@@ -37,6 +39,7 @@ export function useAccess(): Access {
             user: null,
             loading: false,
             isSuperAdmin: false,
+            isPlatformAgent: false,
             companySlug: null,
             companyName: null,
             companyId: null,
@@ -50,6 +53,7 @@ export function useAccess(): Access {
         supabase.from("profiles").select("company_id, full_name").eq("id", user.id).maybeSingle(),
       ]);
       const isSuperAdmin = (roles ?? []).some((r) => r.role === "super_admin");
+      const isPlatformAgent = (roles ?? []).some((r) => r.role === "platform_agent");
       const companyId = profile?.company_id ?? null;
       let companySlug: string | null = null;
       let companyName: string | null = null;
@@ -67,6 +71,7 @@ export function useAccess(): Access {
           user,
           loading: false,
           isSuperAdmin,
+          isPlatformAgent,
           companySlug,
           companyName,
           companyId,
