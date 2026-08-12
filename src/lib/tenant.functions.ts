@@ -29,7 +29,7 @@ const ticketSchema = z.object({
   priority: z.enum(["urgent", "medium", "normal"]),
   requester_name: z.string().min(2).max(120),
   requester_phone: z.string().max(30).optional(),
-  requester_email: z.string().email().max(160).optional().or(z.literal("")),
+  requester_email: z.string().max(160).optional(),
 });
 
 export const submitTicket = createServerFn({ method: "POST" })
@@ -57,41 +57,36 @@ export const submitTicket = createServerFn({ method: "POST" })
         requester_phone: data.requester_phone ?? null,
         requester_email: data.requester_email || null,
       })
-      .select("ticket_no")
+      .select("id, ticket_no")
       .single();
     if (error) throw new Error(error.message);
 
     await supabaseAdmin.from("ticket_updates").insert({
-      ticket_id: undefined as never,
-      note: "",
-    } as never).then(() => undefined, () => undefined);
+      ticket_id: ticket.id,
+      author_name: "النظام",
+      note: "تم استلام التذكرة وهي بانتظار المراجعة.",
+      status: "open",
+    });
 
     return { ticket_no: ticket.ticket_no };
   });
 
 export const trackTicket = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ ticket_no: z.string().min(3).max(40) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ ticket_no: z.string().min(3).max(40) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: ticket } = await supabaseAdmin
       .from("tickets")
-      .select("ticket_no, title, status, priority, branch, created_at, updated_at, requester_name")
+      .select("id, ticket_no, title, status, priority, branch, created_at, updated_at, requester_name")
       .eq("ticket_no", data.ticket_no.trim().toUpperCase())
       .maybeSingle();
     if (!ticket) return null;
     const { data: updates } = await supabaseAdmin
       .from("ticket_updates")
       .select("id, note, status, created_at, author_name")
-      .eq(
-        "ticket_id",
-        (
-          await supabaseAdmin
-            .from("tickets")
-            .select("id")
-            .eq("ticket_no", ticket.ticket_no)
-            .single()
-        ).data!.id,
-      )
+      .eq("ticket_id", ticket.id)
       .order("created_at", { ascending: true });
     return { ticket, updates: updates ?? [] };
   });
