@@ -10,53 +10,120 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as TrackRouteImport } from './routes/track'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
+import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
+import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TrackRoute = TrackRouteImport.update({
-  id: '/track',
-  path: '/track',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const CSlugIndexRoute = CSlugIndexRouteImport.update({
+  id: '/c/$slug/',
+  path: '/c/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CSlugTrackRoute = CSlugTrackRouteImport.update({
+  id: '/c/$slug/track',
+  path: '/c/$slug/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCSlugAdminRoute = AuthenticatedCSlugAdminRouteImport.update({
+  id: '/c/$slug/admin',
+  path: '/c/$slug/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/track': typeof TrackRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug/': typeof CSlugIndexRoute
+  '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/track': typeof TrackRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug': typeof CSlugIndexRoute
+  '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/track': typeof TrackRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug/': typeof CSlugIndexRoute
+  '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/track'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/portal'
+    | '/c/$slug/track'
+    | '/c/$slug/'
+    | '/c/$slug/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/track'
-  id: '__root__' | '/' | '/dashboard' | '/track'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/portal'
+    | '/c/$slug/track'
+    | '/c/$slug'
+    | '/c/$slug/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/portal'
+    | '/c/$slug/track'
+    | '/c/$slug/'
+    | '/_authenticated/c/$slug/admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
-  TrackRoute: typeof TrackRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  CSlugTrackRoute: typeof CSlugTrackRoute
+  CSlugIndexRoute: typeof CSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,27 +135,79 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/track': {
-      id: '/track'
-      path: '/track'
-      fullPath: '/track'
-      preLoaderRoute: typeof TrackRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/c/$slug/': {
+      id: '/c/$slug/'
+      path: '/c/$slug'
+      fullPath: '/c/$slug/'
+      preLoaderRoute: typeof CSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$slug/track': {
+      id: '/c/$slug/track'
+      path: '/c/$slug/track'
+      fullPath: '/c/$slug/track'
+      preLoaderRoute: typeof CSlugTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/c/$slug/admin': {
+      id: '/_authenticated/c/$slug/admin'
+      path: '/c/$slug/admin'
+      fullPath: '/c/$slug/admin'
+      preLoaderRoute: typeof AuthenticatedCSlugAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedCSlugAdminRoute: typeof AuthenticatedCSlugAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedCSlugAdminRoute: AuthenticatedCSlugAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
-  TrackRoute: TrackRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  CSlugTrackRoute: CSlugTrackRoute,
+  CSlugIndexRoute: CSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
