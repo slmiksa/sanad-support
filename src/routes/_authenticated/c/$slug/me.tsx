@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, LogOut, Paperclip, Send, X } from "lucide-react";
+import { ChevronDown, Loader2, LogOut, Paperclip, Send, X } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import { buildFieldConfig, customFields, isEnabled } from "@/lib/company-settings";
