@@ -82,7 +82,9 @@ function CompanyAdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields")
+        .select(
+          "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config",
+        )
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -92,9 +94,10 @@ function CompanyAdminPage() {
           logo_url: data.logo_url ?? "",
           primary_color: data.primary_color,
           secondary_color: data.secondary_color,
-          form_fields: parseFields(data.form_fields),
+          fields: buildFieldConfig(data.form_fields, data.field_config),
         });
       }
+
       return data;
     },
   });
