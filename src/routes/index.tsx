@@ -143,7 +143,6 @@ function LandingPage() {
 
       <main>
         <section className="mx-auto max-w-6xl px-4 py-16">
-          <img src={sanadLogo.url} alt="شعار نظام سند" className="mb-6 h-24 w-auto" />
           <h1 className="max-w-3xl text-3xl font-black leading-tight sm:text-5xl">
             <span className="text-primary">نظام سند</span> للدعم الفني لكل شركة
           </h1>
