@@ -409,19 +409,13 @@ function SuperAdminPage() {
                           </td>
                           <td className="p-2">{ROLE_LABEL[m.role] ?? m.role}</td>
                           <td className="p-2">
-                            {newPasswords[m.user_id] ? (
-                              <span className="font-mono" dir="ltr">
-                                {newPasswords[m.user_id]}
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => resetMutation.mutate(m.user_id)}
-                                disabled={resetMutation.isPending}
-                                className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold"
-                              >
-                                <KeyRound className="h-3 w-3" /> توليد كلمة مرور
-                              </button>
-                            )}
+                            <button
+                              onClick={() => resetMutation.mutate(m.email)}
+                              disabled={resetMutation.isPending || !m.email}
+                              className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold"
+                            >
+                              <KeyRound className="h-3 w-3" /> إرسال رابط إعادة التعيين
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -429,7 +423,8 @@ function SuperAdminPage() {
                   </table>
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  كلمات المرور مشفّرة ولا يمكن استرجاعها؛ استخدم «توليد كلمة مرور» لإصدار كلمة جديدة
+                  كلمات المرور مشفّرة ولا يمكن استرجاعها؛ يصل للعضو رابط لتعيين كلمة مرور جديدة على بريده
+
                   وتسليمها للعميل.
                 </p>
               </>
