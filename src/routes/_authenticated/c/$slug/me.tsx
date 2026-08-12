@@ -10,6 +10,12 @@ import { buildFieldConfig, customFields, isEnabled } from "@/lib/company-setting
 import { formatSize, uploadAttachments } from "@/lib/attachments";
 import { useAccess } from "@/lib/use-access";
 
+function displayAuthor(name?: string | null) {
+  const n = (name ?? "").trim();
+  if (!n || n.includes("@")) return "فريق الدعم";
+  return n;
+}
+
 export const Route = createFileRoute("/_authenticated/c/$slug/me")({
   head: () => ({
     meta: [
@@ -458,7 +464,7 @@ function EmployeePage() {
                         <li key={u.id} className="rounded-xl bg-muted/40 p-3">
                           <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
                             <span className="font-bold text-foreground">
-                              {u.author_name || "فريق الدعم"}
+                              {displayAuthor(u.author_name)}
                             </span>
                             <span>{new Date(u.created_at).toLocaleString("ar")}</span>
                           </div>

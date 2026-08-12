@@ -9,6 +9,12 @@ import { parseAttachments } from "@/lib/attachments";
 import { AttachmentList } from "@/components/AttachmentList";
 import { useAccess } from "@/lib/use-access";
 
+function displayAuthor(name?: string | null) {
+  const n = (name ?? "").trim();
+  if (!n || n.includes("@")) return "فريق الدعم";
+  return n;
+}
+
 export const Route = createFileRoute("/_authenticated/c/$slug/tickets/$ticketId")({
   head: () => ({
     meta: [
@@ -227,7 +233,7 @@ function TicketDetailPage() {
               {(updates.data ?? []).map((u) => (
                 <li key={u.id} className="rounded-xl border border-border p-3">
                   <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                    <span dir="ltr">{u.author_name}</span>
+                    <span>{displayAuthor(u.author_name)}</span>
                     <span>{new Date(u.created_at).toLocaleString("ar")}</span>
                   </div>
                   <p className="mt-1 text-sm font-bold">{u.note}</p>
