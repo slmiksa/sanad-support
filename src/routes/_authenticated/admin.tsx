@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   Building2,
@@ -59,7 +58,6 @@ function SuperAdminPage() {
   const access = useAccess();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const create = useServerFn(createCompany);
   const [form, setForm] = useState(empty);
   const [open, setOpen] = useState(false);
   const [detailsId, setDetailsId] = useState<string | null>(null);
@@ -70,13 +68,11 @@ function SuperAdminPage() {
     admin_email: string;
     admin_password: string;
   } | null>(null);
-  const fetchAccess = useServerFn(getCompanyAccess);
-  const resetPassword = useServerFn(resetMemberPassword);
 
   const details = useQuery({
     queryKey: ["company-access", detailsId],
     enabled: !!detailsId,
-    queryFn: () => fetchAccess({ data: { company_id: detailsId! } }),
+    queryFn: () => getCompanyAccess({ data: { company_id: detailsId! } }),
   });
 
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
@@ -84,7 +80,7 @@ function SuperAdminPage() {
   const resetMutation = useMutation({
     mutationFn: async (userId: string) => {
       const password = generatePassword();
-      await resetPassword({ data: { user_id: userId, password } });
+      await resetMemberPassword({ data: { user_id: userId, password } });
       return { userId, password };
     },
     onSuccess: ({ userId, password }) => {
@@ -108,7 +104,7 @@ function SuperAdminPage() {
 
   const mutation = useMutation({
     mutationFn: async () =>
-      create({
+      createCompany({
         data: {
           ...form,
           branches: form.branches
@@ -690,22 +686,19 @@ function PlatformContactCard() {
 function PlatformStaffCard() {
   const qc = useQueryClient();
   const access = useAccess();
-  const listAgents = useServerFn(listPlatformAgents);
-  const addAgent = useServerFn(createPlatformAgent);
-  const delAgent = useServerFn(removePlatformAgent);
   const [form, setForm] = useState({ full_name: "", email: "", password: "", phone: "" });
   const [open, setOpen] = useState(false);
 
   const agents = useQuery({
     queryKey: ["platform-agents"],
-    queryFn: () => listAgents(),
+    queryFn: () => listPlatformAgents(),
     enabled: access.isSuperAdmin,
     retry: false,
   });
 
 
   const create = useMutation({
-    mutationFn: async () => addAgent({ data: form }),
+    mutationFn: async () => createPlatformAgent({ data: form }),
     onSuccess: (res) => {
       toast.success("تم إنشاء عضوية فني دعم المنصة", {
         description: `${res.email} — ${res.password}`,
@@ -718,7 +711,7 @@ function PlatformStaffCard() {
   });
 
   const remove = useMutation({
-    mutationFn: async (user_id: string) => delAgent({ data: { user_id } }),
+    mutationFn: async (user_id: string) => removePlatformAgent({ data: { user_id } }),
     onSuccess: () => {
       toast.success("تم حذف العضوية");
       void qc.invalidateQueries({ queryKey: ["platform-agents"] });

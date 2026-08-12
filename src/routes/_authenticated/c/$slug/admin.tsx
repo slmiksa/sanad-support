@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   ArrowDown,
@@ -51,7 +50,6 @@ function CompanyAdminPage() {
   const access = useAccess();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const addMember = useServerFn(createCompanyMember);
   const [tab, setTab] = useState<Tab>("tickets");
   const [priority, setPriority] = useState<Priority | "all">("all");
   const [status, setStatus] = useState<Status | "all">("all");
@@ -216,7 +214,7 @@ function CompanyAdminPage() {
   });
 
   const memberMutation = useMutation({
-    mutationFn: async () => addMember({ data: { company_id: companyId!, ...member } }),
+    mutationFn: async () => createCompanyMember({ data: { company_id: companyId!, ...member } }),
     onSuccess: () => {
       toast.success("تم إنشاء الحساب");
       setMember({

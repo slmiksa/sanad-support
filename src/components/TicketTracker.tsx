@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Search } from "lucide-react";
 import { trackTicket } from "@/lib/tenant.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
@@ -7,7 +6,6 @@ import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/ti
 type Result = Awaited<ReturnType<typeof trackTicket>>;
 
 export function TicketTracker() {
-  const track = useServerFn(trackTicket);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -18,7 +16,7 @@ export function TicketTracker() {
     if (!value.trim()) return;
     setBusy(true);
     try {
-      const res = await track({ data: { ticket_no: value.trim() } });
+      const res = await trackTicket({ data: { ticket_no: value.trim() } });
       setResult(res);
       setSearched(true);
     } finally {
