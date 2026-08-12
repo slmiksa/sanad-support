@@ -77,7 +77,12 @@ export const createCompany = createServerFn({ method: "POST" })
       .from("user_roles")
       .insert({ user_id: userId, company_id: company.id, role: "company_admin" });
 
-    return { slug: company.slug };
+    return {
+      slug: company.slug,
+      admin_email: data.admin_email,
+      admin_name: data.admin_name,
+      admin_password: data.admin_password,
+    };
   });
 
 export const createCompanyMember = createServerFn({ method: "POST" })
@@ -140,4 +145,72 @@ export const createCompanyMember = createServerFn({ method: "POST" })
       role: data.role,
     });
     return { ok: true };
+  });
+
+export const getCompanyAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ company_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isSuper) throw new Error("غير مصرح: هذه العملية للأدمن الأعلى فقط");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: company, error } = await supabaseAdmin
+      .from("companies")
+      .select("id, name, slug, tagline, plan, is_active, created_at")
+      .eq("id", data.company_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!company) throw new Error("الشركة غير موجودة");
+
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id, role")
+      .eq("company_id", company.id);
+    const ids = (roles ?? []).map((r) => r.user_id);
+    const { data: profiles } = ids.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, email, employee_no, extension, specialty, department, phone")
+          .in("id", ids)
+      : { data: [] as never[] };
+
+    const members = (roles ?? []).map((r) => {
+      const p = (profiles ?? []).find((x) => x.id === r.user_id);
+      return {
+        user_id: r.user_id,
+        role: r.role as string,
+        full_name: p?.full_name ?? "",
+        email: p?.email ?? "",
+        employee_no: p?.employee_no ?? "",
+        extension: p?.extension ?? "",
+        specialty: p?.specialty ?? "",
+        department: p?.department ?? "",
+        phone: p?.phone ?? "",
+      };
+    });
+
+    return { company, members };
+  });
+
+export const resetMemberPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ user_id: z.string().uuid(), password: z.string().min(8).max(72) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isSuper) throw new Error("غير مصرح: هذه العملية للأدمن الأعلى فقط");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      password: data.password,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true, password: data.password };
   });

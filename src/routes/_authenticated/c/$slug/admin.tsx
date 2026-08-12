@@ -69,10 +69,9 @@ function CompanyAdminPage() {
     role: "employee" as "company_admin" | "agent" | "employee",
   });
   const [settings, setSettings] = useState<{
+    name: string;
     tagline: string;
     logo_url: string;
-    primary_color: string;
-    secondary_color: string;
     fields: FieldItem[];
   } | null>(null);
 
@@ -90,10 +89,9 @@ function CompanyAdminPage() {
       if (error) throw error;
       if (data && !settings) {
         setSettings({
+          name: data.name ?? "",
           tagline: data.tagline ?? "",
           logo_url: data.logo_url ?? "",
-          primary_color: data.primary_color,
-          secondary_color: data.secondary_color,
           fields: buildFieldConfig(data.form_fields, data.field_config),
         });
       }
@@ -160,7 +158,7 @@ function CompanyAdminPage() {
       await supabase.from("ticket_updates").insert({
         ticket_id: id,
         author_id: access.user?.id ?? null,
-        author_name: access.user?.email ?? "فريق الدعم",
+        author_name: access.fullName || "فريق الدعم",
         note: `تم تغيير الحالة إلى: ${STATUS_META[next].label}`,
         status: next,
       });
@@ -175,10 +173,9 @@ function CompanyAdminPage() {
       const { error } = await supabase
         .from("companies")
         .update({
+          name: settings.name,
           tagline: settings.tagline,
           logo_url: settings.logo_url || null,
-          primary_color: settings.primary_color,
-          secondary_color: settings.secondary_color,
           form_fields: fieldsFromConfig(settings.fields),
           field_config: settings.fields,
 
@@ -506,6 +503,14 @@ function CompanyAdminPage() {
             <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
               <h2 className="text-lg font-black">هوية الشركة</h2>
               <label className="block space-y-1.5">
+                <span className="text-xs font-bold text-muted-foreground">اسم الشركة</span>
+                <input
+                  className="field"
+                  value={settings.name}
+                  onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                />
+              </label>
+              <label className="block space-y-1.5">
                 <span className="text-xs font-bold text-muted-foreground">الوصف المختصر</span>
                 <input
                   className="field"
@@ -522,26 +527,6 @@ function CompanyAdminPage() {
                   onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
                 />
               </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-bold text-muted-foreground">اللون الأساسي</span>
-                  <input
-                    type="color"
-                    className="h-11 w-full rounded-xl border border-border bg-background"
-                    value={settings.primary_color}
-                    onChange={(e) => setSettings({ ...settings, primary_color: e.target.value })}
-                  />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-bold text-muted-foreground">اللون الثانوي</span>
-                  <input
-                    type="color"
-                    className="h-11 w-full rounded-xl border border-border bg-background"
-                    value={settings.secondary_color}
-                    onChange={(e) => setSettings({ ...settings, secondary_color: e.target.value })}
-                  />
-                </label>
-              </div>
 
               <h3 className="pt-2 text-sm font-black">حقول نموذج التذكرة</h3>
               <div className="space-y-2">
