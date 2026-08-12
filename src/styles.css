@@ -62,8 +62,10 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --radius: 0.75rem;
+  --shadow-brand: 0 10px 24px -12px color-mix(in oklab, var(--primary) 65%, transparent);
+  --background: oklch(0.985 0.003 250);
+
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -132,6 +134,26 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@theme inline {
+  --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-primary) 20%, transparent);
+  }
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -140,5 +162,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Cairo", ui-sans-serif, system-ui, sans-serif;
   }
 }
+
