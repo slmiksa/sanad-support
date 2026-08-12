@@ -277,7 +277,51 @@ function CompanyAdminPage() {
     );
   }
 
-  const fields = settings?.form_fields ?? DEFAULT_FIELDS;
+  const fields = settings?.fields ?? [];
+
+  const moveField = (index: number, dir: -1 | 1) => {
+    if (!settings) return;
+    const next = [...settings.fields];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    setSettings({ ...settings, fields: next });
+  };
+
+  const updateField = (index: number, patch: Partial<FieldItem>) => {
+    if (!settings) return;
+    const next = settings.fields.map((f, i) => (i === index ? { ...f, ...patch } : f));
+    setSettings({ ...settings, fields: next });
+  };
+
+  const removeField = (index: number) => {
+    if (!settings) return;
+    setSettings({ ...settings, fields: settings.fields.filter((_, i) => i !== index) });
+  };
+
+  const addCustomField = () => {
+    if (!settings || !newField.label.trim()) return;
+    setSettings({
+      ...settings,
+      fields: [
+        ...settings.fields,
+        {
+          key: newCustomKey(),
+          label: newField.label.trim(),
+          enabled: true,
+          custom: true,
+          type: newField.type,
+          required: false,
+          options: newField.options
+            .split(",")
+            .map((o) => o.trim())
+            .filter(Boolean),
+        },
+      ],
+    });
+    setNewField({ label: "", type: "text", options: "" });
+  };
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
