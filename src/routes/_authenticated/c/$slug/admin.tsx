@@ -527,26 +527,130 @@ function CompanyAdminPage() {
 
               <h3 className="pt-2 text-sm font-black">حقول نموذج التذكرة</h3>
               <div className="space-y-2">
-                {(Object.keys(FIELD_LABELS) as (keyof FormFields)[]).map((key) => (
-                  <label
-                    key={key}
-                    className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-xs font-bold"
+                {fields.map((f, i) => (
+                  <div
+                    key={f.key}
+                    className="rounded-xl border border-border px-3 py-2 text-xs font-bold"
                   >
-                    {FIELD_LABELS[key]}
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-[var(--color-primary)]"
-                      checked={fields[key]}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          form_fields: { ...fields, [key]: e.target.checked },
-                        })
-                      }
-                    />
-                  </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        aria-label={`تفعيل ${f.label}`}
+                        className="h-4 w-4 accent-[var(--color-primary)]"
+                        checked={f.enabled}
+                        onChange={(e) => updateField(i, { enabled: e.target.checked })}
+                      />
+                      {f.custom ? (
+                        <input
+                          className="field h-9 flex-1 py-1 text-xs"
+                          value={f.label}
+                          onChange={(e) => updateField(i, { label: e.target.value })}
+                        />
+                      ) : (
+                        <span className="flex-1">{f.label}</span>
+                      )}
+                      <button
+                        type="button"
+                        aria-label="تحريك لأعلى"
+                        onClick={() => moveField(i, -1)}
+                        className="grid h-8 w-8 place-items-center rounded-lg border border-border disabled:opacity-30"
+                        disabled={i === 0}
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="تحريك لأسفل"
+                        onClick={() => moveField(i, 1)}
+                        className="grid h-8 w-8 place-items-center rounded-lg border border-border disabled:opacity-30"
+                        disabled={i === fields.length - 1}
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </button>
+                      {f.custom && (
+                        <button
+                          type="button"
+                          aria-label={`حذف ${f.label}`}
+                          onClick={() => removeField(i)}
+                          className="grid h-8 w-8 place-items-center rounded-lg border border-border text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    {f.custom && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-normal">
+                        <select
+                          className="field h-9 w-auto py-1 text-xs"
+                          value={f.type}
+                          onChange={(e) =>
+                            updateField(i, { type: e.target.value as CustomFieldType })
+                          }
+                        >
+                          <option value="text">نص قصير</option>
+                          <option value="textarea">نص طويل</option>
+                          <option value="number">رقم</option>
+                          <option value="select">قائمة اختيار</option>
+                        </select>
+                        {f.type === "select" && (
+                          <input
+                            className="field h-9 flex-1 py-1 text-xs"
+                            placeholder="الخيارات مفصولة بفاصلة"
+                            value={f.options.join("، ")}
+                            onChange={(e) =>
+                              updateField(i, {
+                                options: e.target.value
+                                  .split(/[،,]/)
+                                  .map((o) => o.trim())
+                                  .filter(Boolean),
+                              })
+                            }
+                          />
+                        )}
+                        <label className="flex items-center gap-1">
+                          <input
+                            type="checkbox"
+                            className="h-3.5 w-3.5 accent-[var(--color-primary)]"
+                            checked={f.required}
+                            onChange={(e) => updateField(i, { required: e.target.checked })}
+                          />
+                          إلزامي
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
+
+              <div className="flex flex-wrap gap-2 rounded-xl border border-dashed border-border p-3">
+                <input
+                  className="field h-10 flex-1 py-1 text-xs"
+                  placeholder="اسم حقل جديد"
+                  value={newField.label}
+                  onChange={(e) => setNewField({ ...newField, label: e.target.value })}
+                />
+                <select
+                  className="field h-10 w-auto py-1 text-xs"
+                  value={newField.type}
+                  onChange={(e) =>
+                    setNewField({ ...newField, type: e.target.value as CustomFieldType })
+                  }
+                >
+                  <option value="text">نص قصير</option>
+                  <option value="textarea">نص طويل</option>
+                  <option value="number">رقم</option>
+                  <option value="select">قائمة اختيار</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={addCustomField}
+                  aria-label="إضافة حقل"
+                  className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+
 
               <button
                 onClick={() => saveSettings.mutate()}
