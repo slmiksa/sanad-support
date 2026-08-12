@@ -176,7 +176,9 @@ function CompanyAdminPage() {
           logo_url: settings.logo_url || null,
           primary_color: settings.primary_color,
           secondary_color: settings.secondary_color,
-          form_fields: settings.form_fields,
+          form_fields: fieldsFromConfig(settings.fields),
+          field_config: settings.fields,
+
         })
         .eq("id", companyId);
       if (error) throw error;
@@ -215,7 +217,18 @@ function CompanyAdminPage() {
     mutationFn: async () => addMember({ data: { company_id: companyId!, ...member } }),
     onSuccess: () => {
       toast.success("تم إنشاء الحساب");
-      setMember({ full_name: "", email: "", password: "", role: "employee" });
+      setMember({
+        full_name: "",
+        email: "",
+        password: "",
+        employee_no: "",
+        extension: "",
+        specialty: "",
+        department: "",
+        phone: "",
+        role: "employee",
+      });
+
       void qc.invalidateQueries({ queryKey: ["members", companyId] });
     },
     onError: (e: Error) => toast.error("تعذّر الإنشاء", { description: e.message }),
