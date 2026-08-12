@@ -49,6 +49,7 @@ export type Database = {
       companies: {
         Row: {
           created_at: string
+          field_config: Json
           form_fields: Json
           id: string
           is_active: boolean
@@ -64,6 +65,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          field_config?: Json
           form_fields?: Json
           id?: string
           is_active?: boolean
@@ -79,6 +81,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          field_config?: Json
           form_fields?: Json
           id?: string
           is_active?: boolean
@@ -98,28 +101,40 @@ export type Database = {
         Row: {
           company_id: string | null
           created_at: string
+          department: string | null
           email: string
+          employee_no: string | null
+          extension: string | null
           full_name: string
           id: string
           phone: string | null
+          specialty: string | null
           updated_at: string
         }
         Insert: {
           company_id?: string | null
           created_at?: string
+          department?: string | null
           email?: string
+          employee_no?: string | null
+          extension?: string | null
           full_name?: string
           id: string
           phone?: string | null
+          specialty?: string | null
           updated_at?: string
         }
         Update: {
           company_id?: string | null
           created_at?: string
+          department?: string | null
           email?: string
+          employee_no?: string | null
+          extension?: string | null
           full_name?: string
           id?: string
           phone?: string | null
+          specialty?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -173,11 +188,13 @@ export type Database = {
       tickets: {
         Row: {
           assignee_id: string | null
+          attachments: Json
           branch: string
           closed_at: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          custom_data: Json
           description: string
           id: string
           priority: Database["public"]["Enums"]["ticket_priority"]
@@ -191,11 +208,13 @@ export type Database = {
         }
         Insert: {
           assignee_id?: string | null
+          attachments?: Json
           branch?: string
           closed_at?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
+          custom_data?: Json
           description?: string
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
@@ -209,11 +228,13 @@ export type Database = {
         }
         Update: {
           assignee_id?: string | null
+          attachments?: Json
           branch?: string
           closed_at?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
+          custom_data?: Json
           description?: string
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
