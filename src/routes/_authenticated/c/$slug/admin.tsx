@@ -439,9 +439,24 @@ function CompanyAdminPage() {
                   {rows.map((t) => (
                     <tr key={t.id} className="border-t border-border">
                       <td className="p-3 font-mono text-xs" dir="ltr">
-                        {t.ticket_no}
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="text-primary hover:underline"
+                        >
+                          {t.ticket_no}
+                        </Link>
                       </td>
-                      <td className="p-3 font-bold">{t.title}</td>
+                      <td className="p-3 font-bold">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="hover:text-primary hover:underline"
+                        >
+                          {t.title}
+                        </Link>
+                      </td>
+
                       <td className="p-3 text-xs text-muted-foreground">{t.branch}</td>
                       <td className="p-3">
                         <span
