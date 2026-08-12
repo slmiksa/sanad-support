@@ -54,6 +54,7 @@ export type Database = {
           id: string
           is_active: boolean
           logo_url: string | null
+          managed_support: boolean
           name: string
           plan: string
           primary_color: string
@@ -70,6 +71,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          managed_support?: boolean
           name: string
           plan?: string
           primary_color?: string
@@ -86,6 +88,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          managed_support?: boolean
           name?: string
           plan?: string
           primary_color?: string
@@ -317,6 +320,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_platform_support: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
       current_company_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -329,6 +336,7 @@ export type Database = {
         Args: { _company_id: string; _user_id: string }
         Returns: boolean
       }
+      is_platform_agent: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
