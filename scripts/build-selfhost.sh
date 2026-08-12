@@ -1,42 +1,33 @@
 #!/usr/bin/env bash
 # ==========================================================
 #  نظام سند للدعم الفني — سكربت بناء النسخة الذاتية (Node.js)
-#  الاستخدام:  bash scripts/build-selfhost.sh
-#  الناتج:     مجلد dist/ جاهز للنسخ إلى السيرفر
-#  ثم على السيرفر:  cp -r dist/* /home/xxxxx.com/public_html/
+#  الاستخدام على سيرفرك:  bash scripts/build-selfhost.sh
+#  الناتج: مجلد dist/ جاهز للنسخ:
+#          cp -r dist/* /home/xxxxx.com/public_html/
 # ==========================================================
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-echo "==> 1/4 تثبيت الاعتماديات"
-if command -v bun >/dev/null 2>&1; then
-  bun install
-else
-  npm install
-fi
+PM="npm"
+command -v bun >/dev/null 2>&1 && PM="bun"
 
-echo "==> 2/4 بناء المشروع بهدف Node.js"
-rm -rf .output dist
+echo "==> 1/4 تثبيت الاعتماديات ($PM)"
+$PM install
+
+echo "==> 2/4 البناء بهدف Node.js"
+rm -rf dist
 export NITRO_PRESET="node-server"
-if command -v bun >/dev/null 2>&1; then
-  bun run build
-else
-  npm run build
-fi
+npx vite build --config vite.selfhost.config.ts
 
-if [ ! -f ".output/server/index.mjs" ]; then
-  echo "!! فشل البناء: لم يتم إنشاء .output/server/index.mjs" >&2
+if [ ! -f "dist/server/index.mjs" ]; then
+  echo "!! فشل البناء: لم يتم إنشاء dist/server/index.mjs" >&2
   exit 1
 fi
 
-echo "==> 3/4 تجهيز مجلد dist"
-mkdir -p dist
-cp -r .output/server dist/server
-cp -r .output/public dist/public
+echo "==> 3/4 تجهيز ملفات التشغيل"
 
-# ملف تشغيل الخادم
 cat > dist/start.sh <<'EOS'
 #!/usr/bin/env bash
 # تشغيل نظام سند
@@ -49,9 +40,8 @@ exec node server/index.mjs
 EOS
 chmod +x dist/start.sh
 
-# نقطة دخول بديلة لبعض لوحات التحكم (cPanel Node.js App)
+# نقطة دخول بديلة للوحات التحكم (cPanel Node.js App / Passenger)
 cat > dist/app.js <<'EOS'
-// نقطة الدخول لتطبيق Node على cPanel / Passenger
 import "./server/index.mjs";
 EOS
 
@@ -65,9 +55,8 @@ cat > dist/package.json <<'EOS'
 }
 EOS
 
-# مثال متغيرات البيئة (املأها على السيرفر باسم .env)
 cat > dist/.env.example <<'EOS'
-# انسخ هذا الملف باسم .env على السيرفر واملأ القيم
+# انسخه باسم .env على السيرفر واملأ القيم
 PORT=3000
 HOST=0.0.0.0
 SUPABASE_URL=
@@ -76,30 +65,30 @@ SUPABASE_SERVICE_ROLE_KEY=
 EOS
 
 cat > dist/README-DEPLOY.txt <<'EOS'
-نظام سند للدعم الفني — خطوات النشر على السيرفر (Node.js)
-=========================================================
-1) انسخ محتويات المجلد:
+نظام سند للدعم الفني — النشر على سيرفر Node.js
+================================================
+1) النسخ:
    cp -r dist/* /home/xxxxx.com/public_html/
 
-2) ادخل مجلد الموقع وأنشئ ملف .env من المثال:
+2) متغيرات البيئة:
    cd /home/xxxxx.com/public_html
-   cp .env.example .env  &&  nano .env
-   (املأ SUPABASE_URL و SUPABASE_PUBLISHABLE_KEY و SUPABASE_SERVICE_ROLE_KEY)
+   cp .env.example .env && nano .env
+   (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY / SUPABASE_SERVICE_ROLE_KEY)
 
-3) التشغيل:
-   - يدوياً:        bash start.sh
-   - أو مع pm2:     pm2 start server/index.mjs --name sanad
-   - أو cPanel:     Setup Node.js App
-                    Application root = مجلد الموقع
-                    Startup file     = app.js
-                    ثم أضف متغيرات البيئة من واجهة cPanel
+3) التشغيل — اختر طريقة:
+   - يدوي:   bash start.sh
+   - pm2:    pm2 start server/index.mjs --name sanad && pm2 save
+   - cPanel: Setup Node.js App
+             Application root = مجلد الموقع
+             Startup file     = app.js
+             ثم أضف المتغيرات من واجهة cPanel واضغط Restart
 
-4) وجّه الدومين للمنفذ (إن لم تستخدم cPanel Node App) عبر Reverse Proxy:
+4) إن شغّلته يدوياً أو عبر pm2، وجّه الدومين للمنفذ:
    ProxyPass        /  http://127.0.0.1:3000/
    ProxyPassReverse /  http://127.0.0.1:3000/
 
-ملاحظة: النظام يحتاج تشغيل Node لأن فيه دوال خادم
-(إنشاء الشركات والعضويات وتصفير كلمات المرور) ولا يكفي رفع ملفات ثابتة.
+ملاحظة: النظام يحتاج Node لأن فيه دوال خادم (إنشاء الشركات
+والعضويات وتصفير كلمات المرور)؛ رفع ملفات ثابتة فقط لا يكفي.
 EOS
 
 echo "==> 4/4 تم"
