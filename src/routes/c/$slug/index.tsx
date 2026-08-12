@@ -48,6 +48,8 @@ export const Route = createFileRoute("/c/$slug/")({
 function TenantPortal() {
   const { company } = Route.useLoaderData();
   const { slug } = Route.useParams();
+  const access = useAccess();
+  const signedIn = !access.loading && !!access.user;
 
   return (
     <div
@@ -73,34 +75,63 @@ function TenantPortal() {
               <p className="text-xs text-muted-foreground">{company.tagline || "الدعم الفني"}</p>
             </div>
           </div>
-          <Link
-            to="/c/$slug/track"
-            params={{ slug }}
-            className="rounded-xl border border-border px-3 py-2 text-xs font-bold"
-          >
-            متابعة تذكرة
-          </Link>
+          <div className="flex items-center gap-2">
+            {signedIn && (
+              <Link
+                to="/c/$slug/me"
+                params={{ slug }}
+                className="rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground"
+              >
+                حسابي
+              </Link>
+            )}
+            <Link
+              to="/c/$slug/track"
+              params={{ slug }}
+              className="rounded-xl border border-border px-3 py-2 text-xs font-bold"
+            >
+              متابعة تذكرة
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto grid max-w-5xl gap-6 px-4 py-8 lg:grid-cols-[1.2fr_1fr]">
         <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
           <h2 className="text-lg font-black">رفع تذكرة دعم فني</h2>
-          <p className="text-sm text-muted-foreground">
-            رفع التذاكر متاح لموظفي {company.name} المسجّلين فقط. سجّل الدخول بحسابك الوظيفي لتظهر
-            بياناتك (الاسم، الرقم الوظيفي، التحويلة، التخصص) تلقائياً مع كل تذكرة، ولتتمكن من متابعة
-            سجل تذاكرك السابقة.
-          </p>
-          <Link
-            to="/auth"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground"
-          >
-            <LogIn className="h-4 w-4" /> تسجيل الدخول لرفع تذكرة
-          </Link>
-          <p className="text-xs text-muted-foreground">
-            لا تملك حساباً؟ تواصل مع مشرف الدعم الفني في شركتك لإنشاء حساب لك.
-          </p>
+          {signedIn ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                أنت مسجّل دخولك بالفعل. انتقل إلى حسابك لرفع تذكرة جديدة ومتابعة سجل تذاكرك السابقة.
+              </p>
+              <Link
+                to="/c/$slug/me"
+                params={{ slug }}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground"
+              >
+                <Ticket className="h-4 w-4" /> الذهاب إلى حسابي ورفع تذكرة
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                رفع التذاكر متاح لموظفي {company.name} المسجّلين فقط. سجّل الدخول بحسابك الوظيفي لتظهر
+                بياناتك (الاسم، الرقم الوظيفي، التحويلة، التخصص) تلقائياً مع كل تذكرة، ولتتمكن من
+                متابعة سجل تذاكرك السابقة.
+              </p>
+              <Link
+                to="/auth"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground"
+              >
+                <LogIn className="h-4 w-4" /> تسجيل الدخول لرفع تذكرة
+              </Link>
+              <p className="text-xs text-muted-foreground">
+                لا تملك حساباً؟ تواصل مع مشرف الدعم الفني في شركتك لإنشاء حساب لك.
+              </p>
+            </>
+          )}
         </section>
+
 
         <aside className="space-y-4 rounded-2xl border border-border bg-card p-6">
           <h2 className="text-lg font-black">متابعة سريعة</h2>
