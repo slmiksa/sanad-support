@@ -12,6 +12,7 @@ import {
   Save,
   Trash2,
   Users,
+  Headset,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { createCompanyMember } from "@/lib/admin.functions";
@@ -82,7 +83,7 @@ function CompanyAdminPage() {
       const { data, error } = await supabase
         .from("companies")
         .select(
-          "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config",
+          "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config, managed_support",
         )
         .eq("slug", slug)
         .maybeSingle();
@@ -373,6 +374,19 @@ function CompanyAdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+        {company.data?.managed_support && (
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-primary/30 bg-primary/10 p-4">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/20 text-primary">
+              <Headset className="h-4 w-4" />
+            </span>
+            <div className="text-sm">
+              <p className="font-black text-primary">نظام خدمة الدعم الفني عن بُعد فعّال</p>
+              <p className="text-xs text-muted-foreground">
+                فريق دعم «لمحة الآمنة» يتابع تذاكر شركتكم ويرد عليها مباشرة على مدار الاشتراك.
+              </p>
+            </div>
+          </div>
+        )}
         {tab === "tickets" && (
           <>
             <div className="grid gap-4 sm:grid-cols-4">
@@ -416,84 +430,22 @@ function CompanyAdminPage() {
               </select>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-              <table className="w-full text-right text-sm">
-                <thead className="bg-muted/60 text-xs text-muted-foreground">
-                  <tr>
-                    <th className="p-3">رقم التذكرة</th>
-                    <th className="p-3">العنوان</th>
-                    <th className="p-3">الفرع</th>
-                    <th className="p-3">الأهمية</th>
-                    <th className="p-3">مقدم الطلب</th>
-                    <th className="p-3">الحالة</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tickets.isLoading && (
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        جارٍ التحميل...
-                      </td>
-                    </tr>
-                  )}
-                  {rows.map((t) => (
-                    <tr key={t.id} className="border-t border-border">
-                      <td className="p-3 font-mono text-xs" dir="ltr">
-                        <Link
-                          to="/c/$slug/tickets/$ticketId"
-                          params={{ slug, ticketId: t.id }}
-                          className="text-primary hover:underline"
-                        >
-                          {t.ticket_no}
-                        </Link>
-                      </td>
-                      <td className="p-3 font-bold">
-                        <Link
-                          to="/c/$slug/tickets/$ticketId"
-                          params={{ slug, ticketId: t.id }}
-                          className="hover:text-primary hover:underline"
-                        >
-                          {t.title}
-                        </Link>
-                      </td>
-
-                      <td className="p-3 text-xs text-muted-foreground">{t.branch}</td>
-                      <td className="p-3">
-                        <span
-                          className={`rounded-lg border px-2 py-1 text-xs font-bold ${
-                            PRIORITY_META[t.priority as Priority].className
-                          }`}
-                        >
-                          {PRIORITY_META[t.priority as Priority].label}
-                        </span>
-                      </td>
-                      <td className="p-3 text-xs">{t.requester_name}</td>
-                      <td className="p-3">
-                        <select
-                          className="field w-auto py-1 text-xs"
-                          value={t.status}
-                          onChange={(e) =>
-                            setTicketStatus.mutate({ id: t.id, next: e.target.value as Status })
-                          }
-                        >
-                          {(Object.keys(STATUS_META) as Status[]).map((s) => (
-                            <option key={s} value={s}>
-                              {STATUS_META[s].label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                  {!tickets.isLoading && rows.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        لا توجد تذاكر مطابقة.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="space-y-6">
+              <MembersSection
+                title="العضويات الإدارية"
+                hint="مشرفو لوحة التحكم — صلاحية كاملة على التذاكر والإعدادات."
+                rows={(members.data ?? []).filter((m) => m.role === "company_admin")}
+              />
+              <MembersSection
+                title="موظفو الشركة"
+                hint="يرفعون التذاكر ويتابعون سجلهم الخاص فقط."
+                rows={(members.data ?? []).filter((m) => m.role === "employee")}
+              />
+              <MembersSection
+                title="فريق الدعم الفني"
+                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
+                rows={(members.data ?? []).filter((m) => m.role === "agent")}
+              />
             </div>
           </>
         )}
@@ -848,5 +800,75 @@ function CompanyAdminPage() {
         )}
       </main>
     </div>
+  );
+}
+
+type MemberRow = {
+  id: string;
+  full_name: string;
+  email: string;
+  employee_no: string | null;
+  extension: string | null;
+  specialty: string | null;
+  department: string | null;
+  role: string;
+};
+
+function MembersSection({
+  title,
+  hint,
+  rows,
+}: {
+  title: string;
+  hint: string;
+  rows: MemberRow[];
+}) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
+        <div>
+          <h3 className="text-sm font-black">{title}</h3>
+          <p className="text-xs text-muted-foreground">{hint}</p>
+        </div>
+        <span className="rounded-lg bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+          {rows.length} عضوية
+        </span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-right text-sm">
+          <thead className="bg-muted/60 text-xs text-muted-foreground">
+            <tr>
+              <th className="p-3">الاسم</th>
+              <th className="p-3">البريد</th>
+              <th className="p-3">الرقم الوظيفي</th>
+              <th className="p-3">التحويلة</th>
+              <th className="p-3">التخصص</th>
+              <th className="p-3">القسم</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((m) => (
+              <tr key={m.id} className="border-t border-border">
+                <td className="p-3 font-bold">{m.full_name || "—"}</td>
+                <td className="p-3 text-xs" dir="ltr">
+                  {m.email}
+                </td>
+                <td className="p-3 text-xs">{m.employee_no || "—"}</td>
+                <td className="p-3 text-xs">{m.extension || "—"}</td>
+                <td className="p-3 text-xs">{m.specialty || "—"}</td>
+                <td className="p-3 text-xs">{m.department || "—"}</td>
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-6 text-center text-xs text-muted-foreground">
+                  لا توجد عضويات في هذا القسم بعد.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
