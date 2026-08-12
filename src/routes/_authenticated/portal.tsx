@@ -16,8 +16,9 @@ function PortalPage() {
     if (access.isSuperAdmin) {
       void navigate({ to: "/admin", replace: true });
     } else if (access.companySlug) {
+      const isStaff = access.role === "company_admin" || access.role === "agent";
       void navigate({
-        to: "/c/$slug/admin",
+        to: isStaff ? "/c/$slug/admin" : "/c/$slug/me",
         params: { slug: access.companySlug },
         replace: true,
       });
