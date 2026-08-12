@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { getCompanyBySlug, submitTicket } from "@/lib/tenant.functions";
 import { PRIORITY_META, type Priority } from "@/lib/tickets";
 import { TicketTracker } from "@/components/TicketTracker";
+import { parseFields } from "@/lib/company-settings";
 
 export const Route = createFileRoute("/c/$slug/")({
   loader: async ({ params }) => {
@@ -49,6 +50,7 @@ function TenantPortal() {
   const { company, branches } = Route.useLoaderData();
   const { slug } = Route.useParams();
   const submit = useServerFn(submitTicket);
+  const fields = parseFields(company.form_fields);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [form, setForm] = useState({
