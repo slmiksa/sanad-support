@@ -407,27 +407,79 @@ function EmployeePage() {
           <h2 className="text-lg font-black">تذاكري السابقة</h2>
           <div className="mt-4 space-y-3">
             {myTickets.isLoading && <p className="text-xs text-muted-foreground">جارٍ التحميل...</p>}
-            {(myTickets.data ?? []).map((t) => (
-              <article key={t.id} className="rounded-xl border border-border p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-xs text-muted-foreground" dir="ltr">
-                    {t.ticket_no}
-                  </span>
-                  <span
-                    className={`rounded-lg border px-2 py-1 text-xs font-bold ${
-                      STATUS_META[t.status as Status].className
-                    }`}
+            {(myTickets.data ?? []).map((t) => {
+              const list = updatesByTicket[t.id] ?? [];
+              const last = list[list.length - 1];
+              const hasNew = !!last && seen[t.id] !== last.created_at;
+              const open = openTicket === t.id;
+              return (
+                <article key={t.id} className="rounded-xl border border-border p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-xs text-muted-foreground" dir="ltr">
+                      {t.ticket_no}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {hasNew && (
+                        <span className="rounded-lg bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
+                          تحديث جديد
+                        </span>
+                      )}
+                      <span
+                        className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                          STATUS_META[t.status as Status].className
+                        }`}
+                      >
+                        {STATUS_META[t.status as Status].label}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-sm font-black">{t.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t.branch || "بدون فرع"} · {PRIORITY_META[t.priority as Priority].label} ·{" "}
+                    {new Date(t.created_at).toLocaleDateString("ar")}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = open ? null : t.id;
+                      setOpenTicket(next);
+                      if (next) markSeen(t.id, last?.created_at);
+                    }}
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-primary"
                   >
-                    {STATUS_META[t.status as Status].label}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm font-black">{t.title}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {t.branch || "بدون فرع"} · {PRIORITY_META[t.priority as Priority].label} ·{" "}
-                  {new Date(t.created_at).toLocaleDateString("ar")}
-                </p>
-              </article>
-            ))}
+                    <ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`} />
+                    {list.length ? `الردود والتحديثات (${list.length})` : "لا توجد ردود بعد"}
+                  </button>
+
+                  {open && list.length > 0 && (
+                    <ul className="mt-3 space-y-2 border-t border-border pt-3">
+                      {list.map((u) => (
+                        <li key={u.id} className="rounded-xl bg-muted/40 p-3">
+                          <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                            <span className="font-bold text-foreground">
+                              {u.author_name || "فريق الدعم"}
+                            </span>
+                            <span>{new Date(u.created_at).toLocaleString("ar")}</span>
+                          </div>
+                          {u.status && (
+                            <span
+                              className={`mt-2 inline-block rounded-lg border px-2 py-0.5 text-[11px] font-bold ${
+                                STATUS_META[u.status as Status].className
+                              }`}
+                            >
+                              تم تغيير الحالة إلى: {STATUS_META[u.status as Status].label}
+                            </span>
+                          )}
+                          {u.note && <p className="mt-2 text-xs leading-6">{u.note}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </article>
+              );
+            })}
+
             {!myTickets.isLoading && (myTickets.data ?? []).length === 0 && (
               <p className="text-xs text-muted-foreground">لم ترفع أي تذكرة بعد.</p>
             )}
