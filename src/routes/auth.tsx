@@ -21,28 +21,14 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/portal`,
-            data: { full_name: name },
-          },
-        });
-        if (error) throw error;
-        toast.success("تم إنشاء الحساب", { description: "يمكنك الآن الدخول." });
-      }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("تم تسجيل الدخول");
@@ -60,25 +46,12 @@ function AuthPage() {
         <Link to="/" className="text-xs font-bold text-primary">
           ← العودة للرئيسية
         </Link>
-        <h1 className="mt-4 text-2xl font-black">
-          {mode === "signin" ? "تسجيل الدخول" : "إنشاء حساب"}
-        </h1>
+        <h1 className="mt-4 text-2xl font-black">تسجيل الدخول</h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          أول حساب يتم إنشاؤه في المنصة يصبح أدمن المنصة (الأدمن الأم) تلقائياً.
+          الحسابات تُنشأ من إدارة شركتك فقط. لا يوجد تسجيل ذاتي.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
-          {mode === "signup" && (
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">الاسم الكامل</span>
-              <input
-                required
-                className="field"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
-          )}
           <label className="block space-y-1.5">
             <span className="text-xs font-bold text-muted-foreground">البريد الإلكتروني</span>
             <input
@@ -107,16 +80,14 @@ function AuthPage() {
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-            {mode === "signin" ? "دخول" : "إنشاء الحساب والدخول"}
+            دخول
           </button>
         </form>
 
-        <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-4 w-full text-xs font-bold text-primary"
-        >
-          {mode === "signin" ? "ليس لديك حساب؟ إنشاء حساب" : "لديك حساب؟ تسجيل الدخول"}
-        </button>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          نسيت كلمة المرور أو لا تملك حساباً؟ تواصل مع مشرف الدعم الفني في شركتك.
+        </p>
+
       </div>
     </div>
   );
