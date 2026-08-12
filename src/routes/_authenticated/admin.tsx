@@ -689,6 +689,7 @@ function PlatformContactCard() {
 
 function PlatformStaffCard() {
   const qc = useQueryClient();
+  const access = useAccess();
   const listAgents = useServerFn(listPlatformAgents);
   const addAgent = useServerFn(createPlatformAgent);
   const delAgent = useServerFn(removePlatformAgent);
@@ -698,7 +699,10 @@ function PlatformStaffCard() {
   const agents = useQuery({
     queryKey: ["platform-agents"],
     queryFn: () => listAgents(),
+    enabled: access.isSuperAdmin,
+    retry: false,
   });
+
 
   const create = useMutation({
     mutationFn: async () => addAgent({ data: form }),
