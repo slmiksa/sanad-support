@@ -78,14 +78,12 @@ function SuperAdminPage() {
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
 
   const resetMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const password = generatePassword();
-      await resetMemberPassword({ data: { user_id: userId, password } });
-      return { userId, password };
+    mutationFn: async (email: string) => {
+      await resetMemberPassword({ data: { email } });
+      return email;
     },
-    onSuccess: ({ userId, password }) => {
-      setNewPasswords((prev) => ({ ...prev, [userId]: password }));
-      toast.success("تم تعيين كلمة مرور جديدة", { description: password });
+    onSuccess: (email) => {
+      toast.success("تم إرسال رابط إعادة تعيين كلمة المرور", { description: email });
     },
     onError: (e: Error) => toast.error(e.message),
   });
