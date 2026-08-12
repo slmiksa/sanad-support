@@ -214,3 +214,92 @@ export const resetMemberPassword = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true, password: data.password };
   });
+
+export const listPlatformAgents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isSuper) throw new Error("غير مصرح: هذه العملية للأدمن الأعلى فقط");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id, created_at")
+      .eq("role", "platform_agent")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    const ids = (roles ?? []).map((r) => r.user_id);
+    const { data: profiles } = ids.length
+      ? await supabaseAdmin.from("profiles").select("id, full_name, email, phone").in("id", ids)
+      : { data: [] as never[] };
+
+    return (roles ?? []).map((r) => {
+      const p = (profiles ?? []).find((x) => x.id === r.user_id);
+      return {
+        user_id: r.user_id,
+        created_at: r.created_at,
+        full_name: p?.full_name ?? "",
+        email: p?.email ?? "",
+        phone: p?.phone ?? "",
+      };
+    });
+  });
+
+export const createPlatformAgent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        full_name: z.string().min(2).max(120),
+        email: z.string().email().max(160),
+        password: z.string().min(8).max(72),
+        phone: z.string().max(30).optional().default(""),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isSuper) throw new Error("غير مصرح: هذه العملية للأدمن الأعلى فقط");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { full_name: data.full_name },
+    });
+    if (error || !created?.user) throw new Error(error?.message ?? "تعذّر إنشاء الحساب");
+
+    await supabaseAdmin.from("profiles").upsert({
+      id: created.user.id,
+      company_id: null,
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone || null,
+    });
+    await supabaseAdmin.from("user_roles").delete().eq("user_id", created.user.id);
+    await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: created.user.id, company_id: null, role: "platform_agent" });
+
+    return { ok: true, email: data.email, password: data.password };
+  });
+
+export const removePlatformAgent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ user_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (!isSuper) throw new Error("غير مصرح: هذه العملية للأدمن الأعلى فقط");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

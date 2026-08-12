@@ -3,9 +3,27 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Building2, Loader2, LogOut, Plus, ExternalLink, Download, KeyRound, Info } from "lucide-react";
+import {
+  Building2,
+  Loader2,
+  LogOut,
+  Plus,
+  ExternalLink,
+  Download,
+  KeyRound,
+  Info,
+  Headset,
+  Trash2,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { createCompany, getCompanyAccess, resetMemberPassword } from "@/lib/admin.functions";
+import {
+  createCompany,
+  getCompanyAccess,
+  resetMemberPassword,
+  listPlatformAgents,
+  createPlatformAgent,
+  removePlatformAgent,
+} from "@/lib/admin.functions";
 import { useAccess } from "@/lib/use-access";
 import { usePlatformSettings } from "@/lib/platform";
 
@@ -81,7 +99,7 @@ function SuperAdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, plan, is_active, created_at")
+        .select("id, name, slug, plan, is_active, created_at, managed_support")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -121,6 +139,21 @@ function SuperAdminPage() {
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["companies"] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleManaged = useMutation({
+    mutationFn: async ({ id, managed }: { id: string; managed: boolean }) => {
+      const { error } = await supabase
+        .from("companies")
+        .update({ managed_support: managed })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث نوع الدعم للشركة");
+      void qc.invalidateQueries({ queryKey: ["companies"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -168,6 +201,7 @@ function SuperAdminPage() {
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
         <PlatformContactCard />
+        <PlatformStaffCard />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
@@ -417,6 +451,7 @@ function SuperAdminPage() {
                 <th className="p-3">المسار</th>
                 <th className="p-3">الباقة</th>
                 <th className="p-3">الحالة</th>
+                <th className="p-3">نوع الدعم</th>
                 <th className="p-3">روابط</th>
               </tr>
             </thead>
@@ -441,6 +476,21 @@ function SuperAdminPage() {
                     </button>
                   </td>
                   <td className="p-3">
+                    <button
+                      onClick={() =>
+                        toggleManaged.mutate({ id: c.id, managed: !c.managed_support })
+                      }
+                      className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-bold ${
+                        c.managed_support
+                          ? "border-primary/30 bg-primary/10 text-primary"
+                          : "border-border bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <Headset className="h-3 w-3" />
+                      {c.managed_support ? "دعم من فريقنا" : "دعم داخلي للشركة"}
+                    </button>
+                  </td>
+                  <td className="p-3">
                     <div className="flex gap-3 text-xs font-bold text-primary">
                       <Link to="/c/$slug" params={{ slug: c.slug }}>
                         بوابة التذاكر <ExternalLink className="inline h-3 w-3" />
@@ -460,7 +510,7 @@ function SuperAdminPage() {
               ))}
               {companies.data?.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     لا توجد شركات بعد — أنشئ أول اشتراك.
                   </td>
                 </tr>
@@ -554,6 +604,7 @@ const ROLE_LABEL: Record<string, string> = {
   agent: "فني دعم",
   employee: "موظف",
   super_admin: "أدمن المنصة",
+  platform_agent: "فني دعم المنصة",
 };
 
 function F({ label, children }: { label: string; children: React.ReactNode }) {
@@ -632,6 +683,179 @@ function PlatformContactCard() {
           </button>
         </div>
       </form>
+    </section>
+  );
+}
+
+function PlatformStaffCard() {
+  const qc = useQueryClient();
+  const listAgents = useServerFn(listPlatformAgents);
+  const addAgent = useServerFn(createPlatformAgent);
+  const delAgent = useServerFn(removePlatformAgent);
+  const [form, setForm] = useState({ full_name: "", email: "", password: "", phone: "" });
+  const [open, setOpen] = useState(false);
+
+  const agents = useQuery({
+    queryKey: ["platform-agents"],
+    queryFn: () => listAgents(),
+  });
+
+  const create = useMutation({
+    mutationFn: async () => addAgent({ data: form }),
+    onSuccess: (res) => {
+      toast.success("تم إنشاء عضوية فني دعم المنصة", {
+        description: `${res.email} — ${res.password}`,
+      });
+      setForm({ full_name: "", email: "", password: "", phone: "" });
+      setOpen(false);
+      void qc.invalidateQueries({ queryKey: ["platform-agents"] });
+    },
+    onError: (e: Error) => toast.error("تعذّر الإنشاء", { description: e.message }),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (user_id: string) => delAgent({ data: { user_id } }),
+    onSuccess: () => {
+      toast.success("تم حذف العضوية");
+      void qc.invalidateQueries({ queryKey: ["platform-agents"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="inline-flex items-center gap-2 text-base font-black">
+            <Headset className="h-4 w-4 text-primary" /> فريق دعم المنصة
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            عضويات موظفي الدعم لدينا — يتابعون تذاكر الشركات المفعّل لها «دعم من فريقنا» عبر
+            المسار <span dir="ltr" className="font-mono">/support</span>.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/support"
+            className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-bold"
+          >
+            فتح مركز الدعم
+          </Link>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground"
+          >
+            <Plus className="h-4 w-4" /> عضوية جديدة
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            create.mutate();
+          }}
+          className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <F label="الاسم الكامل">
+            <input
+              required
+              className="field"
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            />
+          </F>
+          <F label="البريد الإلكتروني">
+            <input
+              required
+              type="email"
+              dir="ltr"
+              className="field"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </F>
+          <F label="كلمة المرور (8 أحرف فأكثر)">
+            <div className="flex gap-2">
+              <input
+                required
+                minLength={8}
+                dir="ltr"
+                className="field"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, password: generatePassword() })}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-border"
+                aria-label="توليد كلمة مرور"
+              >
+                <KeyRound className="h-4 w-4" />
+              </button>
+            </div>
+          </F>
+          <F label="الجوال (اختياري)">
+            <input
+              dir="ltr"
+              className="field"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+          </F>
+          <div className="flex items-end">
+            <button
+              disabled={create.isPending}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground disabled:opacity-60"
+            >
+              {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />} إنشاء العضوية
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="mt-4 overflow-x-auto rounded-xl border border-border">
+        <table className="w-full text-right text-xs">
+          <thead className="bg-muted/60 text-muted-foreground">
+            <tr>
+              <th className="p-2">الاسم</th>
+              <th className="p-2">البريد</th>
+              <th className="p-2">الجوال</th>
+              <th className="p-2">إجراء</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(agents.data ?? []).map((a) => (
+              <tr key={a.user_id} className="border-t border-border">
+                <td className="p-2 font-bold">{a.full_name || "—"}</td>
+                <td className="p-2 font-mono" dir="ltr">
+                  {a.email}
+                </td>
+                <td className="p-2" dir="ltr">
+                  {a.phone || "—"}
+                </td>
+                <td className="p-2">
+                  <button
+                    onClick={() => remove.mutate(a.user_id)}
+                    disabled={remove.isPending}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold text-destructive"
+                  >
+                    <Trash2 className="h-3 w-3" /> حذف
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {agents.data?.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                  لا توجد عضويات دعم بعد.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

@@ -15,6 +15,8 @@ function PortalPage() {
     if (access.loading) return;
     if (access.isSuperAdmin) {
       void navigate({ to: "/admin", replace: true });
+    } else if (access.isPlatformAgent) {
+      void navigate({ to: "/support", replace: true });
     } else if (access.companySlug) {
       const isStaff = access.role === "company_admin" || access.role === "agent";
       void navigate({
@@ -24,6 +26,7 @@ function PortalPage() {
       });
     }
   }, [access, navigate]);
+
 
   return (
     <div className="grid min-h-screen place-items-center gap-3 text-sm text-muted-foreground">
