@@ -60,19 +60,20 @@ function SuperAdminPage() {
     queryFn: () => fetchAccess({ data: { company_id: detailsId! } }),
   });
 
+  const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
+
   const resetMutation = useMutation({
     mutationFn: async (userId: string) => {
       const password = generatePassword();
       await resetPassword({ data: { user_id: userId, password } });
-      return password;
+      return { userId, password };
     },
-    onSuccess: (password) => {
+    onSuccess: ({ userId, password }) => {
+      setNewPasswords((prev) => ({ ...prev, [userId]: password }));
       toast.success("تم تعيين كلمة مرور جديدة", { description: password });
-      setNewPasswords((p) => ({ ...p, [resetMutation.variables as string]: password }));
     },
     onError: (e: Error) => toast.error(e.message),
   });
-  const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
 
   const companies = useQuery({
     queryKey: ["companies"],
@@ -287,6 +288,123 @@ function SuperAdminPage() {
           </form>
         )}
 
+        {lastCreated && (
+          <div className="space-y-3 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-black">بيانات تسجيل الاشتراك الجديد</h3>
+              <button
+                onClick={() =>
+                  downloadText(
+                    `${lastCreated.slug}-access.txt`,
+                    buildAccessText(window.location.origin, lastCreated),
+                  )
+                }
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground"
+              >
+                <Download className="h-4 w-4" /> تحميل ملف نصي
+              </button>
+            </div>
+            <pre
+              dir="ltr"
+              className="overflow-x-auto whitespace-pre-wrap rounded-xl bg-background p-4 text-xs"
+            >
+              {buildAccessText(
+                typeof window !== "undefined" ? window.location.origin : "",
+                lastCreated,
+              )}
+            </pre>
+            <button
+              onClick={() => setLastCreated(null)}
+              className="text-xs font-bold text-muted-foreground"
+            >
+              إخفاء
+            </button>
+          </div>
+        )}
+
+        {detailsId && (
+          <section className="space-y-4 rounded-2xl border border-border bg-card p-5">
+            {details.isLoading && (
+              <p className="text-sm text-muted-foreground">جارٍ تحميل بيانات الاشتراك…</p>
+            )}
+            {details.data && (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-black">{details.data.company.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      الباقة: {details.data.company.plan} —{" "}
+                      {details.data.company.is_active ? "مفعّلة" : "موقوفة"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      downloadText(
+                        `${details.data!.company.slug}-subscription.txt`,
+                        buildCompanyText(window.location.origin, details.data!, newPasswords),
+                      )
+                    }
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground"
+                  >
+                    <Download className="h-4 w-4" /> تحميل ملف البيانات
+                  </button>
+                </div>
+
+                <div className="grid gap-2 rounded-xl bg-muted/50 p-4 text-xs" dir="ltr">
+                  <Row k="Portal" v={`/c/${details.data.company.slug}`} />
+                  <Row k="Tracking" v={`/c/${details.data.company.slug}/track`} />
+                  <Row k="Admin panel" v={`/c/${details.data.company.slug}/admin`} />
+                  <Row k="Employee portal" v={`/c/${details.data.company.slug}/me`} />
+                  <Row k="Login" v={`/auth`} />
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-border">
+                  <table className="w-full text-right text-xs">
+                    <thead className="bg-muted/60 text-muted-foreground">
+                      <tr>
+                        <th className="p-2">الاسم</th>
+                        <th className="p-2">البريد</th>
+                        <th className="p-2">الصلاحية</th>
+                        <th className="p-2">كلمة المرور</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {details.data.members.map((m) => (
+                        <tr key={m.user_id} className="border-t border-border">
+                          <td className="p-2 font-bold">{m.full_name || "—"}</td>
+                          <td className="p-2 font-mono" dir="ltr">
+                            {m.email}
+                          </td>
+                          <td className="p-2">{ROLE_LABEL[m.role] ?? m.role}</td>
+                          <td className="p-2">
+                            {newPasswords[m.user_id] ? (
+                              <span className="font-mono" dir="ltr">
+                                {newPasswords[m.user_id]}
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => resetMutation.mutate(m.user_id)}
+                                disabled={resetMutation.isPending}
+                                className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 font-bold"
+                              >
+                                <KeyRound className="h-3 w-3" /> توليد كلمة مرور
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  كلمات المرور مشفّرة ولا يمكن استرجاعها؛ استخدم «توليد كلمة مرور» لإصدار كلمة جديدة
+                  وتسليمها للعميل.
+                </p>
+              </>
+            )}
+          </section>
+        )}
+
         <div className="overflow-x-auto rounded-2xl border border-border bg-card">
           <table className="w-full text-right text-sm">
             <thead className="bg-muted/60 text-xs text-muted-foreground">
@@ -350,6 +468,89 @@ function SuperAdminPage() {
     </div>
   );
 }
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">{k}</span>
+      <span className="font-mono">{v}</span>
+    </div>
+  );
+}
+
+function buildAccessText(
+  origin: string,
+  c: { name: string; slug: string; admin_name: string; admin_email: string; admin_password: string },
+) {
+  return [
+    `Company: ${c.name}`,
+    `Path: /c/${c.slug}`,
+    `Portal URL: ${origin}/c/${c.slug}`,
+    `Tracking URL: ${origin}/c/${c.slug}/track`,
+    `Admin panel: ${origin}/c/${c.slug}/admin`,
+    `Employee portal: ${origin}/c/${c.slug}/me`,
+    `Login page: ${origin}/auth`,
+    ``,
+    `Admin name: ${c.admin_name}`,
+    `Admin email: ${c.admin_email}`,
+    `Admin password: ${c.admin_password}`,
+  ].join("\n");
+}
+
+function buildCompanyText(
+  origin: string,
+  data: {
+    company: { name: string; slug: string; plan: string; is_active: boolean };
+    members: { user_id: string; full_name: string; email: string; role: string }[];
+  },
+  passwords: Record<string, string>,
+) {
+  const lines = [
+    `Company: ${data.company.name}`,
+    `Plan: ${data.company.plan}`,
+    `Status: ${data.company.is_active ? "active" : "suspended"}`,
+    `Path: /c/${data.company.slug}`,
+    `Portal URL: ${origin}/c/${data.company.slug}`,
+    `Tracking URL: ${origin}/c/${data.company.slug}/track`,
+    `Admin panel: ${origin}/c/${data.company.slug}/admin`,
+    `Employee portal: ${origin}/c/${data.company.slug}/me`,
+    `Login page: ${origin}/auth`,
+    ``,
+    `Accounts:`,
+  ];
+  for (const m of data.members) {
+    lines.push(
+      `- ${m.full_name || "-"} | ${m.email} | ${m.role}${
+        passwords[m.user_id] ? ` | password: ${passwords[m.user_id]}` : ""
+      }`,
+    );
+  }
+  return lines.join("\n");
+}
+
+function generatePassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#";
+  const arr = new Uint32Array(12);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, (n) => chars[n % chars.length]).join("");
+}
+
+function downloadText(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const ROLE_LABEL: Record<string, string> = {
+  company_admin: "أدمن الشركة",
+  agent: "فني دعم",
+  employee: "موظف",
+  super_admin: "أدمن المنصة",
+};
 
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   return (
