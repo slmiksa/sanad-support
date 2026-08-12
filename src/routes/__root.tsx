@@ -81,11 +81,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "نظام تذاكر الدعم الفني | White-Label SaaS" },
+      { title: "نظام سند - للدعم الفني" },
       {
         name: "description",
-        content: "نموذج واجهة عربية لنظام تذاكر دعم فني قابل للتخصيص بالكامل مع وضع ليلي.",
+        content: "نظام سند للدعم الفني: منصة تذاكر متعددة الشركات بهوية خاصة ولوحة تحكم كاملة.",
       },
+      { property: "og:site_name", content: "نظام سند - للدعم الفني" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -97,7 +98,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
+
     ],
   }),
   shellComponent: RootShell,
