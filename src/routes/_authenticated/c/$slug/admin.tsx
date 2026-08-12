@@ -3,11 +3,26 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, LogOut, Plus, Save, Trash2, Users } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Loader2,
+  LogOut,
+  Plus,
+  Save,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { createCompanyMember } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
-import { DEFAULT_FIELDS, FIELD_LABELS, parseFields, type FormFields } from "@/lib/company-settings";
+import {
+  buildFieldConfig,
+  fieldsFromConfig,
+  newCustomKey,
+  type CustomFieldType,
+  type FieldItem,
+} from "@/lib/company-settings";
 import { useAccess } from "@/lib/use-access";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
@@ -20,6 +35,8 @@ export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
       },
       { property: "og:title", content: "لوحة تحكم تذاكر الشركة" },
       { property: "og:description", content: "إدارة كاملة لتذاكر الدعم الفني داخل شركتك." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CompanyAdminPage,
@@ -37,10 +54,18 @@ function CompanyAdminPage() {
   const [priority, setPriority] = useState<Priority | "all">("all");
   const [status, setStatus] = useState<Status | "all">("all");
   const [branchName, setBranchName] = useState("");
+  const [newField, setNewField] = useState<{ label: string; type: CustomFieldType; options: string }>(
+    { label: "", type: "text", options: "" },
+  );
   const [member, setMember] = useState({
     full_name: "",
     email: "",
     password: "",
+    employee_no: "",
+    extension: "",
+    specialty: "",
+    department: "",
+    phone: "",
     role: "employee" as "company_admin" | "agent" | "employee",
   });
   const [settings, setSettings] = useState<{
@@ -48,8 +73,9 @@ function CompanyAdminPage() {
     logo_url: string;
     primary_color: string;
     secondary_color: string;
-    form_fields: FormFields;
+    fields: FieldItem[];
   } | null>(null);
+
 
   const company = useQuery({
     queryKey: ["company", slug],

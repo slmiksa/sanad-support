@@ -18,6 +18,7 @@ import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
+import { Route as AuthenticatedCSlugTicketsTicketIdRouteImport } from './routes/_authenticated/c/$slug/tickets/$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -63,6 +64,12 @@ const AuthenticatedCSlugMeRoute = AuthenticatedCSlugMeRouteImport.update({
   path: '/c/$slug/me',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCSlugTicketsTicketIdRoute =
+  AuthenticatedCSlugTicketsTicketIdRouteImport.update({
+    id: '/c/$slug/tickets/$ticketId',
+    path: '/c/$slug/tickets/$ticketId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/_authenticated/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/c/$slug/'
     | '/c/$slug/admin'
     | '/c/$slug/me'
+    | '/c/$slug/tickets/$ticketId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/c/$slug'
     | '/c/$slug/admin'
     | '/c/$slug/me'
+    | '/c/$slug/tickets/$ticketId'
   id:
     | '__root__'
     | '/'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
     | '/_authenticated/c/$slug/me'
+    | '/_authenticated/c/$slug/tickets/$ticketId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCSlugMeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/c/$slug/tickets/$ticketId': {
+      id: '/_authenticated/c/$slug/tickets/$ticketId'
+      path: '/c/$slug/tickets/$ticketId'
+      fullPath: '/c/$slug/tickets/$ticketId'
+      preLoaderRoute: typeof AuthenticatedCSlugTicketsTicketIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -211,6 +231,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedCSlugAdminRoute: typeof AuthenticatedCSlugAdminRoute
   AuthenticatedCSlugMeRoute: typeof AuthenticatedCSlugMeRoute
+  AuthenticatedCSlugTicketsTicketIdRoute: typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -218,6 +239,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedCSlugAdminRoute: AuthenticatedCSlugAdminRoute,
   AuthenticatedCSlugMeRoute: AuthenticatedCSlugMeRoute,
+  AuthenticatedCSlugTicketsTicketIdRoute:
+    AuthenticatedCSlugTicketsTicketIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
