@@ -17,8 +17,8 @@ export type Branding = {
 };
 
 const DEFAULTS: Branding = {
-  primary: "#2563eb",
-  secondary: "#0f766e",
+  primary: "#2cb3b3",
+  secondary: "#007a7d",
   companyName: "شركتي للتكنولوجيا",
   tagline: "منصة الدعم الفني وإدارة التذاكر",
   logo: null,
