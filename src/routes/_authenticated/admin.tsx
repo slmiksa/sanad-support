@@ -726,6 +726,8 @@ function PlatformStaffCard() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  if (!access.isSuperAdmin) return null;
+
   return (
     <section className="rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
