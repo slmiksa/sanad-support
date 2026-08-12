@@ -144,7 +144,7 @@ function TenantPortal() {
                 onChange={(e) => setForm({ ...form, branch: e.target.value })}
               >
                 <option value="">غير محدد</option>
-                {branches.map((b) => (
+                {branches.map((b: { id: string; name: string }) => (
                   <option key={b.id} value={b.name}>
                     {b.name}
                   </option>
