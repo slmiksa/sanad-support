@@ -758,6 +758,38 @@ function CompanyAdminPage() {
                 value={member.password}
                 onChange={(e) => setMember({ ...member, password: e.target.value })}
               />
+              <input
+                className="field"
+                placeholder="الرقم الوظيفي"
+                value={member.employee_no}
+                onChange={(e) => setMember({ ...member, employee_no: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="التحويلة"
+                value={member.extension}
+                onChange={(e) => setMember({ ...member, extension: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="التخصص"
+                value={member.specialty}
+                onChange={(e) => setMember({ ...member, specialty: e.target.value })}
+              />
+              <input
+                className="field"
+                placeholder="القسم"
+                value={member.department}
+                onChange={(e) => setMember({ ...member, department: e.target.value })}
+              />
+              <input
+                dir="ltr"
+                className="field"
+                placeholder="الجوال"
+                value={member.phone}
+                onChange={(e) => setMember({ ...member, phone: e.target.value })}
+              />
+
               <div className="flex gap-2">
                 <select
                   className="field"
