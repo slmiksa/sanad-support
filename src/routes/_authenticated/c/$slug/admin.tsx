@@ -25,6 +25,7 @@ import {
   type FieldItem,
 } from "@/lib/company-settings";
 import { useAccess } from "@/lib/use-access";
+import { CompanyReports } from "@/components/CompanyReports";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
   head: () => ({
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
   component: CompanyAdminPage,
 });
 
-type Tab = "tickets" | "settings" | "users";
+type Tab = "tickets" | "reports" | "settings" | "users";
 
 function CompanyAdminPage() {
   const { slug } = Route.useParams();
@@ -354,6 +355,7 @@ function CompanyAdminPage() {
           {(
             [
               ["tickets", "التذاكر"],
+              ["reports", "التقارير"],
               ["settings", "التخصيص والحقول"],
               ["users", "العضويات"],
             ] as [Tab, string][]
@@ -430,23 +432,80 @@ function CompanyAdminPage() {
               </select>
             </div>
 
-            <div className="space-y-6">
-              <MembersSection
-                title="العضويات الإدارية"
-                hint="مشرفو لوحة التحكم — صلاحية كاملة على التذاكر والإعدادات."
-                rows={(members.data ?? []).filter((m) => m.role === "company_admin")}
-              />
-              <MembersSection
-                title="موظفو الشركة"
-                hint="يرفعون التذاكر ويتابعون سجلهم الخاص فقط."
-                rows={(members.data ?? []).filter((m) => m.role === "employee")}
-              />
-              <MembersSection
-                title="فريق الدعم الفني"
-                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
-                rows={(members.data ?? []).filter((m) => m.role === "agent")}
-              />
+            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+              <table className="w-full text-right text-sm">
+                <thead className="bg-muted/60 text-xs text-muted-foreground">
+                  <tr>
+                    <th className="p-3">رقم التذكرة</th>
+                    <th className="p-3">العنوان</th>
+                    <th className="p-3">مقدّم الطلب</th>
+                    <th className="p-3">الفرع</th>
+                    <th className="p-3">الأهمية</th>
+                    <th className="p-3">الحالة</th>
+                    <th className="p-3">التاريخ</th>
+                    <th className="p-3">إجراء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((t) => (
+                    <tr key={t.id} className="border-t border-border">
+                      <td className="p-3 text-xs font-bold" dir="ltr">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="text-primary hover:underline"
+                        >
+                          {t.ticket_no}
+                        </Link>
+                      </td>
+                      <td className="p-3 font-bold">
+                        <Link
+                          to="/c/$slug/tickets/$ticketId"
+                          params={{ slug, ticketId: t.id }}
+                          className="hover:underline"
+                        >
+                          {t.title}
+                        </Link>
+                      </td>
+                      <td className="p-3 text-xs">{t.requester_name || "—"}</td>
+                      <td className="p-3 text-xs">{t.branch || "—"}</td>
+                      <td className="p-3 text-xs">
+                        {PRIORITY_META[t.priority as Priority]?.label ?? t.priority}
+                      </td>
+                      <td className="p-3 text-xs">
+                        {STATUS_META[t.status as Status]?.label ?? t.status}
+                      </td>
+                      <td className="p-3 text-xs">
+                        {new Date(t.created_at).toLocaleDateString("ar-SA-u-ca-gregory")}
+                      </td>
+                      <td className="p-3">
+                        <select
+                          className="field h-9 w-auto py-1 text-xs"
+                          value={t.status}
+                          onChange={(e) =>
+                            setTicketStatus.mutate({ id: t.id, next: e.target.value as Status })
+                          }
+                        >
+                          {(Object.keys(STATUS_META) as Status[]).map((s) => (
+                            <option key={s} value={s}>
+                              {STATUS_META[s].label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                  {rows.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                        {tickets.isLoading ? "جارِ التحميل…" : "لا توجد تذاكر."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
+
           </>
         )}
 
@@ -755,49 +814,34 @@ function CompanyAdminPage() {
               </div>
             </form>
 
-            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-              <table className="w-full text-right text-sm">
-                <thead className="bg-muted/60 text-xs text-muted-foreground">
-                  <tr>
-                    <th className="p-3">الاسم</th>
-                    <th className="p-3">البريد</th>
-                    <th className="p-3">الرقم الوظيفي</th>
-                    <th className="p-3">التحويلة</th>
-                    <th className="p-3">التخصص</th>
-                    <th className="p-3">الصلاحية</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(members.data ?? []).map((m) => (
-                    <tr key={m.id} className="border-t border-border">
-                      <td className="p-3 font-bold">{m.full_name || "—"}</td>
-                      <td className="p-3 text-xs" dir="ltr">
-                        {m.email}
-                      </td>
-                      <td className="p-3 text-xs">{m.employee_no || "—"}</td>
-                      <td className="p-3 text-xs">{m.extension || "—"}</td>
-                      <td className="p-3 text-xs">{m.specialty || "—"}</td>
-                      <td className="p-3 text-xs">
-                        {m.role === "company_admin"
-                          ? "مشرف لوحة التحكم"
-                          : m.role === "agent"
-                            ? "فني دعم"
-                            : "موظف"}
-                      </td>
-                    </tr>
-                  ))}
-                  {(members.data ?? []).length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        لا توجد عضويات بعد.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="space-y-6">
+              <MembersSection
+                title="العضويات الإدارية"
+                hint="مشرفو لوحة التحكم — صلاحية كاملة على التذاكر والإعدادات."
+                rows={(members.data ?? []).filter((m) => m.role === "company_admin")}
+              />
+              <MembersSection
+                title="موظفو الشركة"
+                hint="يرفعون التذاكر ويتابعون سجلهم الخاص فقط."
+                rows={(members.data ?? []).filter((m) => m.role === "employee")}
+              />
+              <MembersSection
+                title="فريق الدعم الفني"
+                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
+                rows={(members.data ?? []).filter((m) => m.role === "agent")}
+              />
             </div>
           </div>
         )}
+
+        {tab === "reports" && companyId && (
+          <CompanyReports
+            companyId={companyId}
+            companyName={company.data?.name ?? ""}
+            fields={fields}
+          />
+        )}
+
       </main>
     </div>
   );
