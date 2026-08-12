@@ -697,7 +697,7 @@ function PlatformStaffCard() {
 
   const agents = useQuery({
     queryKey: ["platform-agents"],
-    queryFn: () => listAgents({ data: {} }),
+    queryFn: () => listAgents(),
   });
 
   const create = useMutation({
