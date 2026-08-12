@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BrandingProvider } from "@/lib/branding";
 import { Toaster } from "sonner";
+import { SiteFooter } from "@/components/SiteFooter";
 
 
 function NotFoundComponent() {

@@ -166,6 +166,8 @@ function SuperAdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+        <PlatformContactCard />
+
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
           <button
@@ -175,6 +177,7 @@ function SuperAdminPage() {
             <Plus className="h-4 w-4" /> شركة جديدة
           </button>
         </div>
+
 
         {open && (
           <form
