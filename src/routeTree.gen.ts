@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
@@ -42,6 +43,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const CSlugIndexRoute = CSlugIndexRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/portal'
+    | '/support'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/c/$slug/admin'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/portal'
+    | '/support'
     | '/c/$slug/track'
     | '/c/$slug'
     | '/c/$slug/admin'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
+    | '/_authenticated/support'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
@@ -188,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/c/$slug/': {
       id: '/c/$slug/'
       path: '/c/$slug'
@@ -229,6 +248,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedCSlugAdminRoute: typeof AuthenticatedCSlugAdminRoute
   AuthenticatedCSlugMeRoute: typeof AuthenticatedCSlugMeRoute
   AuthenticatedCSlugTicketsTicketIdRoute: typeof AuthenticatedCSlugTicketsTicketIdRoute
@@ -237,6 +257,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedCSlugAdminRoute: AuthenticatedCSlugAdminRoute,
   AuthenticatedCSlugMeRoute: AuthenticatedCSlugMeRoute,
   AuthenticatedCSlugTicketsTicketIdRoute:
