@@ -29,7 +29,16 @@ type Ctx = Branding & { update: (patch: Partial<Branding>) => void; reset: () =>
 
 const BrandingContext = createContext<Ctx | null>(null);
 
-const STORAGE_KEY = "wl-branding";
+const STORAGE_KEY = "wl-branding-v2";
+
+function readableForeground(hex: string) {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return "oklch(0.99 0 0)";
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const lum = 0.2126 * lin(r!) + 0.7152 * lin(g!) + 0.0722 * lin(b!);
+  return lum > 0.45 ? "oklch(0.14 0.01 220)" : "oklch(0.99 0 0)";
+}
 
 export function BrandingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<Branding>(DEFAULTS);
@@ -57,7 +66,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--ring", state.primary);
     root.style.setProperty("--sidebar-primary", state.primary);
     root.style.setProperty("--brand-secondary", state.secondary);
-    root.style.setProperty("--primary-foreground", "oklch(0.99 0 0)");
+    root.style.setProperty("--primary-foreground", readableForeground(state.primary));
   }, [state]);
 
   const value = useMemo<Ctx>(
