@@ -99,6 +99,52 @@ function EmployeePage() {
     },
   });
 
+  const ticketIds = (myTickets.data ?? []).map((t) => t.id);
+
+  const updates = useQuery({
+    queryKey: ["my-ticket-updates", ticketIds.join(",")],
+    enabled: ticketIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ticket_updates")
+        .select("id, ticket_id, note, status, created_at, author_name")
+        .in("ticket_id", ticketIds)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const updatesByTicket = (updates.data ?? []).reduce<
+    Record<string, NonNullable<typeof updates.data>>
+  >((acc, u) => {
+    (acc[u.ticket_id] ??= []).push(u);
+    return acc;
+  }, {});
+
+  const [openTicket, setOpenTicket] = useState<string | null>(null);
+  const [seen, setSeen] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      setSeen(JSON.parse(localStorage.getItem("ticket-updates-seen") ?? "{}"));
+    } catch {
+      setSeen({});
+    }
+  }, []);
+
+  const markSeen = (ticketId: string, last?: string) => {
+    if (!last) return;
+    const next = { ...seen, [ticketId]: last };
+    setSeen(next);
+    try {
+      localStorage.setItem("ticket-updates-seen", JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  };
+
+
   const create = useMutation({
     mutationFn: async () => {
       const uploaded =
