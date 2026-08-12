@@ -812,49 +812,34 @@ function CompanyAdminPage() {
               </div>
             </form>
 
-            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-              <table className="w-full text-right text-sm">
-                <thead className="bg-muted/60 text-xs text-muted-foreground">
-                  <tr>
-                    <th className="p-3">الاسم</th>
-                    <th className="p-3">البريد</th>
-                    <th className="p-3">الرقم الوظيفي</th>
-                    <th className="p-3">التحويلة</th>
-                    <th className="p-3">التخصص</th>
-                    <th className="p-3">الصلاحية</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(members.data ?? []).map((m) => (
-                    <tr key={m.id} className="border-t border-border">
-                      <td className="p-3 font-bold">{m.full_name || "—"}</td>
-                      <td className="p-3 text-xs" dir="ltr">
-                        {m.email}
-                      </td>
-                      <td className="p-3 text-xs">{m.employee_no || "—"}</td>
-                      <td className="p-3 text-xs">{m.extension || "—"}</td>
-                      <td className="p-3 text-xs">{m.specialty || "—"}</td>
-                      <td className="p-3 text-xs">
-                        {m.role === "company_admin"
-                          ? "مشرف لوحة التحكم"
-                          : m.role === "agent"
-                            ? "فني دعم"
-                            : "موظف"}
-                      </td>
-                    </tr>
-                  ))}
-                  {(members.data ?? []).length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        لا توجد عضويات بعد.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="space-y-6">
+              <MembersSection
+                title="العضويات الإدارية"
+                hint="مشرفو لوحة التحكم — صلاحية كاملة على التذاكر والإعدادات."
+                rows={(members.data ?? []).filter((m) => m.role === "company_admin")}
+              />
+              <MembersSection
+                title="موظفو الشركة"
+                hint="يرفعون التذاكر ويتابعون سجلهم الخاص فقط."
+                rows={(members.data ?? []).filter((m) => m.role === "employee")}
+              />
+              <MembersSection
+                title="فريق الدعم الفني"
+                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
+                rows={(members.data ?? []).filter((m) => m.role === "agent")}
+              />
             </div>
           </div>
         )}
+
+        {tab === "reports" && companyId && (
+          <CompanyReports
+            companyId={companyId}
+            companyName={company.data?.name ?? ""}
+            fields={fields}
+          />
+        )}
+
       </main>
     </div>
   );
