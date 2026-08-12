@@ -137,7 +137,10 @@ function CompanyAdminPage() {
     enabled: !!companyId,
     queryFn: async () => {
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email").eq("company_id", companyId!),
+        supabase
+          .from("profiles")
+          .select("id, full_name, email, employee_no, extension, specialty, department")
+          .eq("company_id", companyId!),
         supabase.from("user_roles").select("user_id, role").eq("company_id", companyId!),
       ]);
       return (profiles ?? []).map((p) => ({
@@ -821,6 +824,9 @@ function CompanyAdminPage() {
                   <tr>
                     <th className="p-3">الاسم</th>
                     <th className="p-3">البريد</th>
+                    <th className="p-3">الرقم الوظيفي</th>
+                    <th className="p-3">التحويلة</th>
+                    <th className="p-3">التخصص</th>
                     <th className="p-3">الصلاحية</th>
                   </tr>
                 </thead>
@@ -831,6 +837,9 @@ function CompanyAdminPage() {
                       <td className="p-3 text-xs" dir="ltr">
                         {m.email}
                       </td>
+                      <td className="p-3 text-xs">{m.employee_no || "—"}</td>
+                      <td className="p-3 text-xs">{m.extension || "—"}</td>
+                      <td className="p-3 text-xs">{m.specialty || "—"}</td>
                       <td className="p-3 text-xs">
                         {m.role === "company_admin"
                           ? "مشرف لوحة التحكم"
@@ -842,7 +851,7 @@ function CompanyAdminPage() {
                   ))}
                   {(members.data ?? []).length === 0 && (
                     <tr>
-                      <td colSpan={3} className="p-8 text-center text-muted-foreground">
+                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
                         لا توجد عضويات بعد.
                       </td>
                     </tr>
