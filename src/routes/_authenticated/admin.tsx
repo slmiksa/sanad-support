@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Building2, Loader2, LogOut, Plus, ExternalLink } from "lucide-react";
+import { Building2, Loader2, LogOut, Plus, ExternalLink, Download, KeyRound, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { createCompany } from "@/lib/admin.functions";
+import { createCompany, getCompanyAccess, resetMemberPassword } from "@/lib/admin.functions";
 import { useAccess } from "@/lib/use-access";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -43,6 +43,36 @@ function SuperAdminPage() {
   const create = useServerFn(createCompany);
   const [form, setForm] = useState(empty);
   const [open, setOpen] = useState(false);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [lastCreated, setLastCreated] = useState<{
+    name: string;
+    slug: string;
+    admin_name: string;
+    admin_email: string;
+    admin_password: string;
+  } | null>(null);
+  const fetchAccess = useServerFn(getCompanyAccess);
+  const resetPassword = useServerFn(resetMemberPassword);
+
+  const details = useQuery({
+    queryKey: ["company-access", detailsId],
+    enabled: !!detailsId,
+    queryFn: () => fetchAccess({ data: { company_id: detailsId! } }),
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const password = generatePassword();
+      await resetPassword({ data: { user_id: userId, password } });
+      return password;
+    },
+    onSuccess: (password) => {
+      toast.success("تم تعيين كلمة مرور جديدة", { description: password });
+      setNewPasswords((p) => ({ ...p, [resetMutation.variables as string]: password }));
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
 
   const companies = useQuery({
     queryKey: ["companies"],
@@ -67,8 +97,15 @@ function SuperAdminPage() {
             .filter(Boolean),
         },
       }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       toast.success("تم إنشاء الشركة وحساب الأدمن");
+      setLastCreated({
+        name: form.name,
+        slug: res.slug,
+        admin_name: form.admin_name,
+        admin_email: form.admin_email,
+        admin_password: form.admin_password,
+      });
       setForm(empty);
       setOpen(false);
       void qc.invalidateQueries({ queryKey: ["companies"] });
@@ -289,6 +326,12 @@ function SuperAdminPage() {
                       <Link to="/c/$slug/admin" params={{ slug: c.slug }}>
                         لوحة الشركة
                       </Link>
+                      <button
+                        onClick={() => setDetailsId(detailsId === c.id ? null : c.id)}
+                        className="inline-flex items-center gap-1 font-bold text-foreground"
+                      >
+                        <Info className="h-3 w-3" /> بيانات الاشتراك
+                      </button>
                     </div>
                   </td>
                 </tr>
