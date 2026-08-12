@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCSlugAdminRoute = AuthenticatedCSlugAdminRouteImport.update({
+  id: '/c/$slug/admin',
+  path: '/c/$slug/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,12 +85,27 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/track' | '/admin' | '/portal'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/track'
+    | '/admin'
+    | '/portal'
+    | '/c/$slug/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/track' | '/admin' | '/portal'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/track'
+    | '/admin'
+    | '/portal'
+    | '/c/$slug/admin'
   id:
     | '__root__'
     | '/'
@@ -92,6 +115,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
+    | '/_authenticated/c/$slug/admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,17 +177,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/c/$slug/admin': {
+      id: '/_authenticated/c/$slug/admin'
+      path: '/c/$slug/admin'
+      fullPath: '/c/$slug/admin'
+      preLoaderRoute: typeof AuthenticatedCSlugAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedCSlugAdminRoute: typeof AuthenticatedCSlugAdminRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedCSlugAdminRoute: AuthenticatedCSlugAdminRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
