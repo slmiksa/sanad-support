@@ -225,18 +225,16 @@ function LandingPage() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden">
+        <section
+          className="relative overflow-hidden"
+          style={{ background: "var(--hero-gradient)" }}
+        >
           <div
-            className="absolute inset-0 -z-10"
-            style={{ background: "var(--hero-gradient)" }}
-            aria-hidden
-          />
-          <div
-            className="absolute -top-24 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl"
+            className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl"
             style={{ background: "color-mix(in oklab, var(--brand) 35%, transparent)" }}
             aria-hidden
           />
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:py-24">
+          <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-24">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold text-brand-light backdrop-blur sm:text-xs">
               <Sparkles className="h-3.5 w-3.5" /> منصة تذاكر دعم فني متعددة الشركات
             </span>
@@ -379,12 +377,10 @@ function LandingPage() {
 
         {/* Contact */}
         <section id="contact" className="mx-auto max-w-6xl px-4 pb-20">
-          <div className="relative overflow-hidden rounded-3xl border border-primary/20 p-8 text-center sm:p-12">
-            <div
-              className="absolute inset-0 -z-10"
-              style={{ background: "var(--hero-gradient)" }}
-              aria-hidden
-            />
+          <div
+            className="relative overflow-hidden rounded-3xl border border-primary/20 p-8 text-center sm:p-12"
+            style={{ background: "var(--hero-gradient)" }}
+          >
             <h2 className="text-2xl font-black text-white sm:text-3xl">اطلب الخدمة الآن</h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/70">
               نجهّز لشركتك بوابة تذاكر خاصة بهويتها ومسارها خلال وقت قصير. تواصل معنا واختر الطريقة
