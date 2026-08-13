@@ -174,7 +174,7 @@ function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Building2 className="h-5 w-5" />
@@ -197,7 +197,7 @@ function SuperAdminPage() {
         <PlatformContactCard />
         <PlatformStaffCard />
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
           <button
             onClick={() => setOpen((v) => !v)}

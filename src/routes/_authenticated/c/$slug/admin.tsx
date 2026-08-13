@@ -349,7 +349,7 @@ function CompanyAdminPage() {
             </button>
           </div>
         </div>
-        <div className="mx-auto flex max-w-6xl gap-2 px-4 pb-3">
+        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(
             [
               ["tickets", "التذاكر"],
@@ -361,7 +361,7 @@ function CompanyAdminPage() {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+              className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-black transition ${
                 tab === key
                   ? "bg-primary text-primary-foreground"
                   : "border border-border text-muted-foreground"
@@ -389,7 +389,7 @@ function CompanyAdminPage() {
         )}
         {tab === "tickets" && (
           <>
-            <div className="grid gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               {[
                 { label: "إجمالي التذاكر", value: stats.total },
                 { label: "مفتوحة", value: stats.open },
