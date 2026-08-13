@@ -349,7 +349,7 @@ function CompanyAdminPage() {
             </button>
           </div>
         </div>
-        <div className="mx-auto flex max-w-6xl gap-2 px-4 pb-3">
+        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(
             [
               ["tickets", "التذاكر"],
