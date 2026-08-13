@@ -132,7 +132,7 @@ function PlatformSupportPage() {
         <section>
           <h2 className="mb-3 text-sm font-black">الشركات التي نتولى دعمها</h2>
           {companies.isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {(companies.data ?? []).map((c) => (
               <button
                 key={c.id}

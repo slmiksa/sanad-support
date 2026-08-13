@@ -389,7 +389,7 @@ function CompanyAdminPage() {
         )}
         {tab === "tickets" && (
           <>
-            <div className="grid gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               {[
                 { label: "إجمالي التذاكر", value: stats.total },
                 { label: "مفتوحة", value: stats.open },
