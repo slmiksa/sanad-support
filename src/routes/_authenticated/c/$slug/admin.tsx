@@ -361,7 +361,7 @@ function CompanyAdminPage() {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+              className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-black transition ${
                 tab === key
                   ? "bg-primary text-primary-foreground"
                   : "border border-border text-muted-foreground"
