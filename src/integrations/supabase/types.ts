@@ -100,6 +100,27 @@ export type Database = {
         }
         Relationships: []
       }
+      keepalive_log: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          source?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           contact_email: string
@@ -364,6 +385,7 @@ export type Database = {
       }
       is_platform_agent: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      run_keepalive: { Args: never; Returns: undefined }
       track_ticket_public: { Args: { _ticket_no: string }; Returns: Json }
     }
     Enums: {
