@@ -8,6 +8,7 @@ import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/ti
 import { parseAttachments } from "@/lib/attachments";
 import { AttachmentList } from "@/components/AttachmentList";
 import { useAccess } from "@/lib/use-access";
+import { AccessGate } from "@/components/AccessGate";
 
 export const Route = createFileRoute("/_authenticated/support")({
   head: () => ({
@@ -24,8 +25,21 @@ export const Route = createFileRoute("/_authenticated/support")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: PlatformSupportPage,
+  component: PlatformSupportGuard,
 });
+
+function PlatformSupportGuard() {
+  const access = useAccess();
+  return (
+    <AccessGate
+      loading={access.loading}
+      allowed={access.isPlatformAgent || access.isSuperAdmin}
+      message="هذه الصفحة مخصصة لفريق دعم المنصة"
+    >
+      <PlatformSupportPage />
+    </AccessGate>
+  );
+}
 
 function displayAuthor(name?: string | null) {
   const n = (name ?? "").trim();
@@ -90,19 +104,6 @@ function PlatformSupportPage() {
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
   };
-
-  if (!access.loading && !allowed) {
-    return (
-      <div className="grid min-h-screen place-items-center px-4 text-center">
-        <div>
-          <p className="text-lg font-black">هذه الصفحة مخصصة لفريق دعم المنصة</p>
-          <Link to="/portal" className="mt-3 inline-block text-sm font-bold text-primary">
-            العودة إلى حسابك
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

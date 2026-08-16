@@ -8,6 +8,7 @@ import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/ti
 import { parseAttachments } from "@/lib/attachments";
 import { AttachmentList } from "@/components/AttachmentList";
 import { useAccess } from "@/lib/use-access";
+import { AccessGate } from "@/components/AccessGate";
 
 function displayAuthor(name?: string | null) {
   const n = (name ?? "").trim();
@@ -29,8 +30,27 @@ export const Route = createFileRoute("/_authenticated/c/$slug/tickets/$ticketId"
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TicketDetailPage,
+  component: TicketDetailGuard,
 });
+
+function TicketDetailGuard() {
+  const { slug } = Route.useParams();
+  const access = useAccess();
+  const isStaff = access.role === "company_admin" || access.role === "agent";
+  const allowed =
+    access.isSuperAdmin ||
+    access.isPlatformAgent ||
+    (isStaff && !!access.companySlug && access.companySlug === slug);
+  return (
+    <AccessGate
+      loading={access.loading}
+      allowed={allowed}
+      message="لا تملك صلاحية عرض هذه التذكرة"
+    >
+      <TicketDetailPage />
+    </AccessGate>
+  );
+}
 
 function TicketDetailPage() {
   const { slug, ticketId } = Route.useParams();

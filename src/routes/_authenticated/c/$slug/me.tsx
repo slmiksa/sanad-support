@@ -9,6 +9,7 @@ import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/ti
 import { buildFieldConfig, customFields, isEnabled } from "@/lib/company-settings";
 import { formatSize, uploadAttachments } from "@/lib/attachments";
 import { useAccess } from "@/lib/use-access";
+import { AccessGate } from "@/components/AccessGate";
 
 function displayAuthor(name?: string | null) {
   const n = (name ?? "").trim();
@@ -30,8 +31,22 @@ export const Route = createFileRoute("/_authenticated/c/$slug/me")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: EmployeePage,
+  component: EmployeeGuard,
 });
+
+function EmployeeGuard() {
+  const { slug } = Route.useParams();
+  const access = useAccess();
+  return (
+    <AccessGate
+      loading={access.loading}
+      allowed={!!access.user && !!access.companySlug && access.companySlug === slug}
+      message="حسابك غير مرتبط بهذه الشركة"
+    >
+      <EmployeePage />
+    </AccessGate>
+  );
+}
 
 function EmployeePage() {
   const { slug } = Route.useParams();

@@ -24,6 +24,7 @@ import {
   removePlatformAgent,
 } from "@/lib/admin.functions";
 import { useAccess } from "@/lib/use-access";
+import { AccessGate } from "@/components/AccessGate";
 import { usePlatformSettings } from "@/lib/platform";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -38,8 +39,21 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { property: "og:description", content: "إدارة اشتراكات الشركات وحسابات الأدمن." },
     ],
   }),
-  component: SuperAdminPage,
+  component: SuperAdminGuard,
 });
+
+function SuperAdminGuard() {
+  const access = useAccess();
+  return (
+    <AccessGate
+      loading={access.loading}
+      allowed={access.isSuperAdmin}
+      message="هذه الصفحة مخصصة لأدمن المنصة"
+    >
+      <SuperAdminPage />
+    </AccessGate>
+  );
+}
 
 const empty = {
   name: "",
@@ -157,19 +171,6 @@ function SuperAdminPage() {
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
   };
-
-  if (!access.loading && !access.isSuperAdmin) {
-    return (
-      <div className="grid min-h-screen place-items-center px-4 text-center">
-        <div>
-          <p className="text-lg font-black">هذه الصفحة مخصصة لأدمن المنصة</p>
-          <Link to="/portal" className="mt-3 inline-block text-sm font-bold text-primary">
-            العودة إلى حسابك
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
