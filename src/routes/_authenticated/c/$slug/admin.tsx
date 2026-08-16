@@ -24,6 +24,7 @@ import {
   type FieldItem,
 } from "@/lib/company-settings";
 import { useAccess } from "@/lib/use-access";
+import { AccessGate } from "@/components/AccessGate";
 import { CompanyReports } from "@/components/CompanyReports";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
@@ -40,8 +41,25 @@ export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: CompanyAdminPage,
+  component: CompanyAdminGuard,
 });
+
+function CompanyAdminGuard() {
+  const { slug } = Route.useParams();
+  const access = useAccess();
+  const isStaff = access.role === "company_admin" || access.role === "agent";
+  const allowed =
+    access.isSuperAdmin || (isStaff && !!access.companySlug && access.companySlug === slug);
+  return (
+    <AccessGate
+      loading={access.loading}
+      allowed={allowed}
+      message="لا تملك صلاحية الوصول إلى لوحة هذه الشركة"
+    >
+      <CompanyAdminPage />
+    </AccessGate>
+  );
+}
 
 type Tab = "tickets" | "reports" | "settings" | "users";
 
@@ -260,22 +278,6 @@ function CompanyAdminPage() {
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
   };
-
-  const allowed =
-    access.loading || access.isSuperAdmin || (!!companyId && access.companyId === companyId);
-
-  if (!allowed) {
-    return (
-      <div className="grid min-h-screen place-items-center px-4 text-center">
-        <div>
-          <p className="text-lg font-black">لا تملك صلاحية الوصول إلى لوحة هذه الشركة</p>
-          <Link to="/portal" className="mt-3 inline-block text-sm font-bold text-primary">
-            العودة إلى حسابك
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const fields = settings?.fields ?? [];
 
