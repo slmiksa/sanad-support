@@ -22,12 +22,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { createCompanyMember } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
+  COMPANY_SELECT,
   buildFieldConfig,
   fieldsFromConfig,
   newCustomKey,
   type CustomFieldType,
   type FieldItem,
 } from "@/lib/company-settings";
+
 import { resizeImage } from "@/lib/image-resize";
 import { useAccess } from "@/lib/use-access";
 
@@ -124,24 +126,25 @@ function CompanyAdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select(
-          "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config, managed_support",
-        )
+        .select(COMPANY_SELECT)
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
-      if (data && !settings) {
-        setSettings({
-          name: data.name ?? "",
-          tagline: data.tagline ?? "",
-          logo_url: data.logo_url ?? "",
-          fields: buildFieldConfig(data.form_fields, data.field_config),
-        });
-      }
-
       return data;
     },
   });
+
+  useEffect(() => {
+    const data = company.data;
+    if (!data || settings) return;
+    setSettings({
+      name: data.name ?? "",
+      tagline: data.tagline ?? "",
+      logo_url: data.logo_url ?? "",
+      fields: buildFieldConfig(data.form_fields, data.field_config),
+    });
+  }, [company.data, settings]);
+
 
   const companyId = company.data?.id ?? null;
 
