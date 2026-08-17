@@ -121,6 +121,39 @@ export type Database = {
         }
         Relationships: []
       }
+      login_otps: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           contact_email: string
@@ -385,6 +418,7 @@ export type Database = {
       }
       is_platform_agent: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      requires_two_factor: { Args: { _user_id: string }; Returns: boolean }
       run_keepalive: { Args: never; Returns: undefined }
       track_ticket_public: { Args: { _ticket_no: string }; Returns: Json }
     }
