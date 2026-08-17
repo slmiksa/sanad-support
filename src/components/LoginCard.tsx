@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { LogIn, Loader2, ShieldCheck, MailCheck, ArrowRight, KeyRound, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import sanadLogo from "@/assets/sanad-logo.png.asset.json";
+import sanadLogo from "@/assets/sanad-logo.png";
 
 type Stage = "credentials" | "otp";
 
@@ -158,7 +158,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
             </Link>
             <div className="mt-4 flex items-center gap-3">
               <img
-                src={logoUrl || sanadLogo.url}
+                src={logoUrl || sanadLogo}
                 alt={title}
                 className="h-14 w-14 shrink-0 rounded-2xl bg-white object-contain p-1.5 shadow-sm sm:h-16 sm:w-16"
               />

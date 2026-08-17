@@ -17,7 +17,7 @@ import {
   Search,
 } from "lucide-react";
 import { usePlatformSettings, whatsappLink } from "@/lib/platform";
-import sanadLogo from "@/assets/sanad-logo.png.asset.json";
+import sanadLogo from "@/assets/sanad-logo.png";
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/accordion";
 
 const SITE_ORIGIN = "https://project--0ea35464-4366-4fbb-82c3-d3352d37ad72.lovable.app";
-const LOGO_URL = `${SITE_ORIGIN}${sanadLogo.url}`;
+const LOGO_URL = `${SITE_ORIGIN}${sanadLogo}`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -201,7 +201,7 @@ function LandingPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="/" className="flex items-center" aria-label="نظام سند للدعم الفني">
             <img
-              src={sanadLogo.url}
+              src={sanadLogo}
               alt="شعار نظام سند للدعم الفني"
               className="h-14 w-auto sm:h-16"
             />

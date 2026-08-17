@@ -23,7 +23,9 @@ import {
   type CustomFieldType,
   type FieldItem,
 } from "@/lib/company-settings";
+import { resizeImage } from "@/lib/image-resize";
 import { useAccess } from "@/lib/use-access";
+
 import { AccessGate } from "@/components/AccessGate";
 import { CompanyReports } from "@/components/CompanyReports";
 
@@ -531,15 +533,61 @@ function CompanyAdminPage() {
                   onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
                 />
               </label>
-              <label className="block space-y-1.5">
-                <span className="text-xs font-bold text-muted-foreground">رابط الشعار</span>
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-muted-foreground">شعار الشركة</span>
+                <div className="flex items-center gap-3">
+                  {settings.logo_url ? (
+                    <img
+                      src={settings.logo_url}
+                      alt="شعار الشركة"
+                      className="h-16 w-16 rounded-xl border border-border object-contain"
+                    />
+                  ) : (
+                    <span className="grid h-16 w-16 place-items-center rounded-xl bg-primary text-xl font-black text-primary-foreground">
+                      {settings.name.trim().charAt(0) || "ش"}
+                    </span>
+                  )}
+                  <div className="flex flex-1 flex-col gap-2">
+                    <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-bold hover:bg-muted">
+                      رفع شعار من جهازك
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = "";
+                          if (!file) return;
+                          try {
+                            const dataUrl = await resizeImage(file, 256);
+                            setSettings((s) => (s ? { ...s, logo_url: dataUrl } : s));
+                            toast.success("تم تحميل الشعار — لا تنسَ حفظ الإعدادات");
+                          } catch {
+                            toast.error("تعذّر قراءة الصورة");
+                          }
+                        }}
+                      />
+                    </label>
+                    {settings.logo_url && (
+                      <button
+                        type="button"
+                        onClick={() => setSettings({ ...settings, logo_url: "" })}
+                        className="text-xs font-bold text-muted-foreground hover:text-destructive"
+                      >
+                        إزالة الشعار
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <input
                   dir="ltr"
                   className="field"
-                  value={settings.logo_url}
+                  placeholder="أو الصق رابط الشعار"
+                  value={settings.logo_url.startsWith("data:") ? "" : settings.logo_url}
                   onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
                 />
-              </label>
+              </div>
+
 
               <h3 className="pt-2 text-sm font-black">حقول نموذج التذكرة</h3>
               <p className="text-xs text-muted-foreground">
