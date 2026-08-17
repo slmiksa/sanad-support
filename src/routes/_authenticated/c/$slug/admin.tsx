@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -247,7 +247,11 @@ function CompanyAdminPage() {
         status: next,
       });
     },
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["tickets", companyId] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["tickets", companyId] });
+      void qc.invalidateQueries({ queryKey: ["ticket-stats", companyId] });
+    },
+
     onError: (e: Error) => toast.error(e.message),
   });
 
