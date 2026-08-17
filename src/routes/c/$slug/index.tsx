@@ -85,18 +85,11 @@ function TenantPortal() {
                 حسابي
               </Link>
             )}
-            <Link
-              to="/c/$slug/track"
-              params={{ slug }}
-              className="rounded-xl border border-border px-3 py-2 text-xs font-bold"
-            >
-              متابعة تذكرة
-            </Link>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-5xl gap-6 px-4 py-8 lg:grid-cols-[1.2fr_1fr]">
+      <main className="mx-auto grid max-w-3xl gap-6 px-4 py-8">
         <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
           <h2 className="text-lg font-black">رفع تذكرة دعم فني</h2>
           {signedIn ? (
@@ -134,13 +127,6 @@ function TenantPortal() {
         </section>
 
 
-        <aside className="space-y-4 rounded-2xl border border-border bg-card p-6">
-          <h2 className="text-lg font-black">متابعة سريعة</h2>
-          <p className="text-xs text-muted-foreground">
-            أدخل رقم التذكرة لعرض حالتها وسجل التحديثات.
-          </p>
-          <TicketTracker />
-        </aside>
       </main>
     </div>
   );
