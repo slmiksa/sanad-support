@@ -67,13 +67,14 @@ function EmployeePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, tagline, form_fields, field_config")
+        .select(COMPANY_SELECT)
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
+
 
   const profile = useQuery({
     queryKey: ["my-profile", access.user?.id],
