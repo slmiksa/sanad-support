@@ -97,7 +97,6 @@ function SuperAdminPage() {
       return email;
     },
     onSuccess: (email) => {
-      toast.success("تم إرسال رابط إعادة تعيين كلمة المرور", { description: email });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -126,7 +125,6 @@ function SuperAdminPage() {
         },
       }),
     onSuccess: (res) => {
-      toast.success("تم إنشاء الشركة وحساب الأدمن");
       setLastCreated({
         name: form.name,
         slug: res.slug,
@@ -159,7 +157,6 @@ function SuperAdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم تحديث نوع الدعم للشركة");
       void qc.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -623,7 +620,6 @@ function PlatformContactCard() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم حفظ بيانات التواصل");
       void qc.invalidateQueries({ queryKey: ["platform-settings"] });
     },
     onError: (e: Error) => toast.error("تعذّر الحفظ", { description: e.message }),
@@ -692,9 +688,6 @@ function PlatformStaffCard() {
   const create = useMutation({
     mutationFn: async () => createPlatformAgent({ data: form }),
     onSuccess: (res) => {
-      toast.success("تم إنشاء عضوية فني دعم المنصة", {
-        description: `${res.email} — ${res.password}`,
-      });
       setForm({ full_name: "", email: "", password: "", phone: "" });
       setOpen(false);
       void qc.invalidateQueries({ queryKey: ["platform-agents"] });
@@ -705,7 +698,6 @@ function PlatformStaffCard() {
   const remove = useMutation({
     mutationFn: async (user_id: string) => removePlatformAgent({ data: { user_id } }),
     onSuccess: () => {
-      toast.success("تم حذف العضوية");
       void qc.invalidateQueries({ queryKey: ["platform-agents"] });
     },
     onError: (e: Error) => toast.error(e.message),

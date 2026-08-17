@@ -212,7 +212,6 @@ function EmployeePage() {
     },
 
     onSuccess: (no) => {
-      toast.success("تم رفع التذكرة", { description: no });
       setForm({ title: "", description: "", branch: "", priority: "normal" });
       setFiles([]);
       setExtra({});

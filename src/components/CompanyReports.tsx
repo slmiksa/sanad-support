@@ -34,7 +34,6 @@ export function CompanyReports({
     if (!report.data) return;
     try {
       exportTicketsExcel(report.data, fields, companyName, from, to);
-      toast.success("تم تصدير التقرير بصيغة Excel");
     } catch (e) {
       toast.error("تعذّر التصدير", { description: (e as Error).message });
     }

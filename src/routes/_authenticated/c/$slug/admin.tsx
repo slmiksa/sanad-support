@@ -272,7 +272,6 @@ function CompanyAdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم حفظ إعدادات الشركة");
       void qc.invalidateQueries({ queryKey: ["company", slug] });
     },
     onError: (e: Error) => toast.error("تعذّر الحفظ", { description: e.message }),
@@ -304,7 +303,6 @@ function CompanyAdminPage() {
   const memberMutation = useMutation({
     mutationFn: async () => createCompanyMember({ data: { company_id: companyId!, ...member } }),
     onSuccess: () => {
-      toast.success("تم إنشاء الحساب");
       setMember({
         full_name: "",
         email: "",
@@ -686,7 +684,6 @@ function CompanyAdminPage() {
                           try {
                             const dataUrl = await resizeImage(file, 256);
                             setSettings((s) => (s ? { ...s, logo_url: dataUrl } : s));
-                            toast.success("تم تحميل الشعار — لا تنسَ حفظ الإعدادات");
                           } catch {
                             toast.error("تعذّر قراءة الصورة");
                           }
