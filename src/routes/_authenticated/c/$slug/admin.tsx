@@ -542,6 +542,10 @@ function CompanyAdminPage() {
               </label>
 
               <h3 className="pt-2 text-sm font-black">حقول نموذج التذكرة</h3>
+              <p className="text-xs text-muted-foreground">
+                يمكنك تعديل مسمّى أي حقل، تفعيله أو إخفاؤه، جعله إلزامياً، إعادة ترتيبه، وحذف ما لا
+                تحتاجه (عدا عنوان التذكرة). تُحفظ كل التغييرات في قاعدة البيانات.
+              </p>
               <div className="space-y-2">
                 {fields.map((f, i) => (
                   <div
@@ -554,17 +558,15 @@ function CompanyAdminPage() {
                         aria-label={`تفعيل ${f.label}`}
                         className="h-4 w-4 accent-[var(--color-primary)]"
                         checked={f.enabled}
+                        disabled={f.key === "title"}
                         onChange={(e) => updateField(i, { enabled: e.target.checked })}
                       />
-                      {f.custom ? (
-                        <input
-                          className="field h-9 flex-1 py-1 text-xs"
-                          value={f.label}
-                          onChange={(e) => updateField(i, { label: e.target.value })}
-                        />
-                      ) : (
-                        <span className="flex-1">{f.label}</span>
-                      )}
+                      <input
+                        className="field h-9 flex-1 py-1 text-xs"
+                        aria-label={`مسمّى الحقل ${f.label}`}
+                        value={f.label}
+                        onChange={(e) => updateField(i, { label: e.target.value })}
+                      />
                       <button
                         type="button"
                         aria-label="تحريك لأعلى"
@@ -583,7 +585,7 @@ function CompanyAdminPage() {
                       >
                         <ArrowDown className="h-3.5 w-3.5" />
                       </button>
-                      {f.custom && (
+                      {!f.core && (
                         <button
                           type="button"
                           aria-label={`حذف ${f.label}`}
@@ -594,10 +596,11 @@ function CompanyAdminPage() {
                         </button>
                       )}
                     </div>
-                    {f.custom && (
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-normal">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-normal">
+                      {f.custom && (
                         <select
                           className="field h-9 w-auto py-1 text-xs"
+                          aria-label={`نوع الحقل ${f.label}`}
                           value={f.type}
                           onChange={(e) =>
                             updateField(i, { type: e.target.value as CustomFieldType })
@@ -608,35 +611,44 @@ function CompanyAdminPage() {
                           <option value="number">رقم</option>
                           <option value="select">قائمة اختيار</option>
                         </select>
-                        {f.type === "select" && (
-                          <input
-                            className="field h-9 flex-1 py-1 text-xs"
-                            placeholder="الخيارات مفصولة بفاصلة"
-                            value={f.options.join("، ")}
-                            onChange={(e) =>
-                              updateField(i, {
-                                options: e.target.value
-                                  .split(/[،,]/)
-                                  .map((o) => o.trim())
-                                  .filter(Boolean),
-                              })
-                            }
-                          />
-                        )}
+                      )}
+                      {f.custom && f.type === "select" && (
+                        <input
+                          className="field h-9 flex-1 py-1 text-xs"
+                          placeholder="الخيارات مفصولة بفاصلة"
+                          value={f.options.join("، ")}
+                          onChange={(e) =>
+                            updateField(i, {
+                              options: e.target.value
+                                .split(/[،,]/)
+                                .map((o) => o.trim())
+                                .filter(Boolean),
+                            })
+                          }
+                        />
+                      )}
+                      {f.key !== "attachments" && (
                         <label className="flex items-center gap-1">
                           <input
                             type="checkbox"
                             className="h-3.5 w-3.5 accent-[var(--color-primary)]"
                             checked={f.required}
+                            disabled={f.key === "title"}
                             onChange={(e) => updateField(i, { required: e.target.checked })}
                           />
                           إلزامي
                         </label>
-                      </div>
-                    )}
+                      )}
+                      {!f.custom && (
+                        <span className="text-muted-foreground">
+                          {f.core ? "حقل جوهري" : "حقل أساسي"}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
+
 
               <div className="flex flex-wrap gap-2 rounded-xl border border-dashed border-border p-3">
                 <input
