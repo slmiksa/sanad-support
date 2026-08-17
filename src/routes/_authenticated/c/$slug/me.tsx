@@ -286,30 +286,39 @@ function EmployeePage() {
             className="space-y-4 rounded-2xl border border-border bg-card p-6"
           >
             <h2 className="text-lg font-black">رفع تذكرة جديدة</h2>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">عنوان المشكلة</span>
-              <input
-                required
-                className="field"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-            </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">الوصف</span>
-              <textarea
-                required
-                rows={4}
-                className="field"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
-            </label>
 
             {fieldItems
               .filter((f) => f.enabled)
               .map((f) => {
+                if (f.key === "title")
+                  return (
+                    <label key={f.key} className="block space-y-1.5">
+                      <span className="text-xs font-bold text-muted-foreground">{f.label}</span>
+                      <input
+                        required
+                        className="field"
+                        value={form.title}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                      />
+                    </label>
+                  );
+
+                if (f.key === "description")
+                  return (
+                    <label key={f.key} className="block space-y-1.5">
+                      <span className="text-xs font-bold text-muted-foreground">{f.label}</span>
+                      <textarea
+                        required={f.required}
+                        rows={4}
+                        className="field"
+                        value={form.description}
+                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      />
+                    </label>
+                  );
+
                 if (f.key === "branch")
+
                   return (
                     <label key={f.key} className="block space-y-1.5">
                       <span className="text-xs font-bold text-muted-foreground">{f.label}</span>
