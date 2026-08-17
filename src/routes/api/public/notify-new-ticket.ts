@@ -83,14 +83,26 @@ export const Route = createFileRoute("/api/public/notify-new-ticket")({
             .eq("id", ticket.company_id)
             .maybeSingle();
 
-          if (!company?.managed_support) return json({ sent: false, reason: "not_managed" });
+          if (!company) return json({ sent: false, reason: "no_company" });
 
-          const { data: roles } = await admin
+          // فريق الدعم الفني داخل الشركة الكلاينت — يصلهم الإشعار دائماً
+          const { data: companyAgents } = await admin
             .from("user_roles")
             .select("user_id")
-            .eq("role", "platform_agent");
+            .eq("role", "agent")
+            .eq("company_id", ticket.company_id);
 
-          const ids = (roles ?? []).map((r) => r.user_id);
+          const ids = (companyAgents ?? []).map((r) => r.user_id);
+
+          // موظفو دعم لمحة — فقط إذا كانت الشركة مدعومة من فريقنا
+          if (company.managed_support) {
+            const { data: platformAgents } = await admin
+              .from("user_roles")
+              .select("user_id")
+              .eq("role", "platform_agent");
+            ids.push(...(platformAgents ?? []).map((r) => r.user_id));
+          }
+
           if (!ids.length) return json({ sent: false, reason: "no_agents" });
 
           const { data: agents } = await admin
