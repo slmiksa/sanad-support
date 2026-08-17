@@ -17,6 +17,7 @@ import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as ApiPublicNotifyNewTicketRouteImport } from './routes/api/public/notify-new-ticket'
 import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
+import { Route as CSlugLoginRouteImport } from './routes/c/$slug/login'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
@@ -64,6 +65,11 @@ const CSlugIndexRoute = CSlugIndexRouteImport.update({
   path: '/c/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CSlugLoginRoute = CSlugLoginRouteImport.update({
+  id: '/c/$slug/login',
+  path: '/c/$slug/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CSlugTrackRoute = CSlugTrackRouteImport.update({
   id: '/c/$slug/track',
   path: '/c/$slug/track',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
   '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
+  '/c/$slug/login': typeof CSlugLoginRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
   '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
+  '/c/$slug/login': typeof CSlugLoginRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
+  '/c/$slug/login': typeof CSlugLoginRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/support'
     | '/api/public/notify-new-ticket'
+    | '/c/$slug/login'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/c/$slug/admin'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/support'
     | '/api/public/notify-new-ticket'
+    | '/c/$slug/login'
     | '/c/$slug/track'
     | '/c/$slug'
     | '/c/$slug/admin'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal'
     | '/_authenticated/support'
     | '/api/public/notify-new-ticket'
+    | '/c/$slug/login'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicNotifyNewTicketRoute: typeof ApiPublicNotifyNewTicketRoute
+  CSlugLoginRoute: typeof CSlugLoginRoute
   CSlugTrackRoute: typeof CSlugTrackRoute
   CSlugIndexRoute: typeof CSlugIndexRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/c/$slug'
       fullPath: '/c/$slug/'
       preLoaderRoute: typeof CSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$slug/login': {
+      id: '/c/$slug/login'
+      path: '/c/$slug/login'
+      fullPath: '/c/$slug/login'
+      preLoaderRoute: typeof CSlugLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/c/$slug/track': {
@@ -333,6 +353,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiPublicNotifyNewTicketRoute: ApiPublicNotifyNewTicketRoute,
+  CSlugLoginRoute: CSlugLoginRoute,
   CSlugTrackRoute: CSlugTrackRoute,
   CSlugIndexRoute: CSlugIndexRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
