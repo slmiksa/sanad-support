@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { LogIn, Ticket } from "lucide-react";
+import { LayoutDashboard, LogIn, Ticket, Clock, Users, ShieldCheck } from "lucide-react";
 import { getCompanyBySlug } from "@/lib/tenant.functions";
 import { useAccess } from "@/lib/use-access";
+
 
 
 export const Route = createFileRoute("/c/$slug/")({
