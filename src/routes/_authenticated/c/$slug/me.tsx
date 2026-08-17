@@ -211,8 +211,7 @@ function EmployeePage() {
       return ticketNo;
     },
 
-    onSuccess: (no) => {
-      toast.success("تم رفع التذكرة", { description: no });
+    onSuccess: () => {
       setForm({ title: "", description: "", branch: "", priority: "normal" });
       setFiles([]);
       setExtra({});

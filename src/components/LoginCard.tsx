@@ -98,14 +98,12 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
       }
 
       if (!result["required"]) {
-        toast.success("تم تسجيل الدخول");
         goPortal();
         return;
       }
 
       await supabase.auth.signOut();
       setStage("otp");
-      toast.success("أرسلنا رمز التحقق إلى بريدك الإلكتروني");
     } catch (err) {
       toast.error("تعذّر تسجيل الدخول", { description: (err as Error).message });
     } finally {
@@ -120,7 +118,6 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
       await callOtpApi("verify", { email, code: code.trim() });
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      toast.success("تم التحقق بنجاح");
       goPortal();
     } catch (err) {
       toast.error("تعذّر التحقق", { description: (err as Error).message });
@@ -133,7 +130,6 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
     setResending(true);
     try {
       await callOtpApi("send", { email });
-      toast.success("تم إرسال رمز جديد");
     } catch (err) {
       toast.error("تعذّر إعادة الإرسال", { description: (err as Error).message });
     } finally {

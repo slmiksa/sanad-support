@@ -320,7 +320,6 @@ function TicketPanel({ ticketId, companyId }: { ticketId: string; companyId: str
     },
     onSuccess: () => {
       setNote("");
-      toast.success("تم إرسال الرد");
       refresh();
     },
     onError: (e: Error) => toast.error(e.message),
