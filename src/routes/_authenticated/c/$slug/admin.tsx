@@ -276,7 +276,7 @@ function CompanyAdminPage() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    void navigate({ to: "/auth", replace: true });
+    void navigate({ to: "/c/$slug/login", params: { slug }, replace: true });
   };
 
   const fields = settings?.fields ?? [];
