@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { LogIn, Ticket } from "lucide-react";
 import { getCompanyBySlug } from "@/lib/tenant.functions";
-import { TicketTracker } from "@/components/TicketTracker";
 import { useAccess } from "@/lib/use-access";
 
 
