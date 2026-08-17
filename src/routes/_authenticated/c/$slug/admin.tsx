@@ -70,6 +70,20 @@ function CompanyAdminGuard() {
 
 type Tab = "tickets" | "reports" | "settings" | "users";
 
+const PAGE_SIZE = 15;
+
+type TicketRow = {
+  id: string;
+  ticket_no: string;
+  title: string;
+  branch: string;
+  priority: string;
+  status: string;
+  requester_name: string;
+  created_at: string;
+};
+
+
 function CompanyAdminPage() {
   const { slug } = Route.useParams();
   const access = useAccess();
