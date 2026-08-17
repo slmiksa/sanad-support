@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { LogIn, Loader2, ShieldCheck, MailCheck, ArrowRight, KeyRound, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import sanadLogo from "@/assets/sanad-logo.png.asset.json";
 
 type Stage = "credentials" | "otp";
 
@@ -141,13 +142,13 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
   };
 
   return (
-    <div className="relative grid min-h-screen place-items-center overflow-hidden bg-background px-4 py-12">
+    <div className="relative grid min-h-[100svh] place-items-center overflow-hidden bg-background px-4 py-8 sm:py-12">
       <div className="pointer-events-none absolute -top-32 right-[-10%] h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
       <div className="pointer-events-none absolute bottom-[-20%] left-[-10%] h-96 w-96 rounded-full bg-primary/15 blur-3xl" />
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-[26rem] sm:max-w-md">
         <div className="overflow-hidden rounded-3xl border border-border/70 bg-card/80 shadow-xl backdrop-blur">
-          <div className="bg-gradient-to-br from-primary to-primary/70 px-7 py-7 text-primary-foreground">
+          <div className="bg-gradient-to-br from-primary to-primary/70 px-5 py-6 text-primary-foreground sm:px-7 sm:py-7">
             <Link
               to={backTo.to}
               params={backTo.params as never}
@@ -156,27 +157,21 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
               ← {backTo.label}
             </Link>
             <div className="mt-4 flex items-center gap-3">
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt={title}
-                  className="h-12 w-12 rounded-2xl bg-white/90 object-contain p-1"
-                />
-              ) : (
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20 text-lg font-black">
-                  {title.slice(0, 1)}
-                </span>
-              )}
-              <div>
-                <h1 className="text-xl font-black leading-tight">
+              <img
+                src={logoUrl || sanadLogo.url}
+                alt={title}
+                className="h-14 w-14 shrink-0 rounded-2xl bg-white object-contain p-1.5 shadow-sm sm:h-16 sm:w-16"
+              />
+              <div className="min-w-0">
+                <h1 className="truncate text-lg font-black leading-tight sm:text-xl">
                   {stage === "credentials" ? title : "التحقق بخطوتين"}
                 </h1>
-                <p className="text-[11px] opacity-90">{subtitle}</p>
+                <p className="truncate text-[11px] opacity-90">{subtitle}</p>
               </div>
             </div>
           </div>
 
-          <div className="px-7 py-7">
+          <div className="px-5 py-6 sm:px-7 sm:py-7">
             {stage === "credentials" ? (
               <>
                 <p className="text-xs leading-6 text-muted-foreground">
@@ -226,13 +221,6 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
                   </button>
                 </form>
 
-                <div className="mt-5 flex items-start gap-2 rounded-2xl border border-border bg-muted/40 p-3 text-[11px] leading-5 text-muted-foreground">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <span>
-                    حسابات الإدارة وفريق الدعم محمية بمصادقة ثنائية: بعد كلمة المرور يصلك رمز تحقق على
-                    بريدك. حسابات الموظفين لرفع التذاكر تدخل مباشرة.
-                  </span>
-                </div>
               </>
             ) : (
               <>
