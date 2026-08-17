@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
+import { Route as ApiPublicNotifyNewTicketRouteImport } from './routes/api/public/notify-new-ticket'
 import { Route as CSlugIndexRouteImport } from './routes/c/$slug/index'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
@@ -52,6 +53,12 @@ const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
   path: '/support',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicNotifyNewTicketRoute =
+  ApiPublicNotifyNewTicketRouteImport.update({
+    id: '/api/public/notify-new-ticket',
+    path: '/api/public/notify-new-ticket',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CSlugIndexRoute = CSlugIndexRouteImport.update({
   id: '/c/$slug/',
   path: '/c/$slug/',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -125,6 +134,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/api/public/notify-new-ticket': typeof ApiPublicNotifyNewTicketRoute
   '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/portal'
     | '/support'
+    | '/api/public/notify-new-ticket'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/c/$slug/admin'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/portal'
     | '/support'
+    | '/api/public/notify-new-ticket'
     | '/c/$slug/track'
     | '/c/$slug'
     | '/c/$slug/admin'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/portal'
     | '/_authenticated/support'
+    | '/api/public/notify-new-ticket'
     | '/c/$slug/track'
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
@@ -183,6 +196,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicNotifyNewTicketRoute: typeof ApiPublicNotifyNewTicketRoute
   CSlugTrackRoute: typeof CSlugTrackRoute
   CSlugIndexRoute: typeof CSlugIndexRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
@@ -232,6 +246,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/support'
       preLoaderRoute: typeof AuthenticatedSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/notify-new-ticket': {
+      id: '/api/public/notify-new-ticket'
+      path: '/api/public/notify-new-ticket'
+      fullPath: '/api/public/notify-new-ticket'
+      preLoaderRoute: typeof ApiPublicNotifyNewTicketRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/c/$slug/': {
       id: '/c/$slug/'
@@ -311,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicNotifyNewTicketRoute: ApiPublicNotifyNewTicketRoute,
   CSlugTrackRoute: CSlugTrackRoute,
   CSlugIndexRoute: CSlugIndexRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,

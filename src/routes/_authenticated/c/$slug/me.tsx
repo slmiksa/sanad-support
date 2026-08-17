@@ -194,8 +194,22 @@ function EmployeePage() {
         }, {}),
       });
       if (error) throw error;
+
+      // إشعار فريق دعم لمحة (يُرسل فقط إذا كانت الشركة مدعومة من فريقنا)
+      try {
+        const base = (import.meta.env["VITE_OTP_API_BASE"] as string | undefined) ?? "";
+        void fetch(`${base}/api/public/notify-new-ticket`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ticket_no: ticketNo }),
+        });
+      } catch {
+        /* الإشعار لا يعطّل رفع التذكرة */
+      }
+
       return ticketNo;
     },
+
     onSuccess: (no) => {
       toast.success("تم رفع التذكرة", { description: no });
       setForm({ title: "", description: "", branch: "", priority: "normal" });
