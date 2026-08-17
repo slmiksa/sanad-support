@@ -23,7 +23,9 @@ import {
   type CustomFieldType,
   type FieldItem,
 } from "@/lib/company-settings";
+import { resizeImage } from "@/lib/image-resize";
 import { useAccess } from "@/lib/use-access";
+
 import { AccessGate } from "@/components/AccessGate";
 import { CompanyReports } from "@/components/CompanyReports";
 
