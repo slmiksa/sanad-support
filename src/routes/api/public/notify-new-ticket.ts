@@ -27,7 +27,7 @@ function emailHtml(opts: {
     <table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e2e8e9">
       <tr><td style="background:linear-gradient(135deg,#2cb3b3,#17656b);padding:26px 24px;text-align:center;color:#ffffff">
         <div style="font-size:20px;font-weight:800">نظام سند للدعم الفني</div>
-        <div style="font-size:13px;opacity:.92;margin-top:6px">تذكرة جديدة من شركة مدعومة من فريقنا</div>
+        <div style="font-size:13px;opacity:.92;margin-top:6px">تذكرة جديدة بحاجة إلى معالجة</div>
       </td></tr>
       <tr><td style="padding:26px 24px;color:#0f2a33">
         <p style="margin:0 0 14px;font-size:15px;font-weight:800">الشركة: ${opts.companyName}</p>
