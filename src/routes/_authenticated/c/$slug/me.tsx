@@ -211,7 +211,7 @@ function EmployeePage() {
       return ticketNo;
     },
 
-    onSuccess: (no) => {
+    onSuccess: () => {
       setForm({ title: "", description: "", branch: "", priority: "normal" });
       setFiles([]);
       setExtra({});
