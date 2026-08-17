@@ -318,16 +318,17 @@ function EmployeePage() {
                   );
 
                 if (f.key === "branch")
-
                   return (
                     <label key={f.key} className="block space-y-1.5">
                       <span className="text-xs font-bold text-muted-foreground">{f.label}</span>
                       <select
+                        required={f.required}
                         className="field"
                         value={form.branch}
                         onChange={(e) => setForm({ ...form, branch: e.target.value })}
                       >
                         <option value="">غير محدد</option>
+
                         {(branches.data ?? []).map((b) => (
                           <option key={b.id} value={b.name}>
                             {b.name}
