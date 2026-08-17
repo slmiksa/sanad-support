@@ -597,6 +597,37 @@ function CompanyAdminPage() {
               </table>
             </div>
 
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+              <p className="text-muted-foreground">
+                {totalCount > 0
+                  ? `عرض ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, totalCount)} من ${totalCount} تذكرة`
+                  : "لا توجد نتائج"}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((v) => Math.max(1, v - 1))}
+                  className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-2 font-bold disabled:opacity-40"
+                >
+                  <ChevronRight className="h-4 w-4" /> السابق
+                </button>
+                <span className="font-bold">
+                  صفحة {page} من {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
+                  className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-2 font-bold disabled:opacity-40"
+                >
+                  التالي <ChevronLeft className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+
+
           </>
         )}
 
