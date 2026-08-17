@@ -1,4 +1,9 @@
+/** أعمدة الشركة المستخدمة في كل الشاشات — موحّدة لضمان تطابق الحقول بين اللوحة ونموذج الموظف */
+export const COMPANY_SELECT =
+  "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config, managed_support";
+
 export type FormFields = {
+
   branch: boolean;
   phone: boolean;
   email: boolean;
