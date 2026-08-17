@@ -1,18 +1,23 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ArrowDown,
   ArrowUp,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   LogOut,
   Plus,
+  RefreshCw,
   Save,
+  Search,
   Trash2,
   Users,
   Headset,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { createCompanyMember } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
@@ -73,7 +78,11 @@ function CompanyAdminPage() {
   const [tab, setTab] = useState<Tab>("tickets");
   const [priority, setPriority] = useState<Priority | "all">("all");
   const [status, setStatus] = useState<Status | "all">("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [branchName, setBranchName] = useState("");
+
   const [newField, setNewField] = useState<{ label: string; type: CustomFieldType; options: string }>(
     { label: "", type: "text", options: "" },
   );
@@ -123,18 +132,56 @@ function CompanyAdminPage() {
   const companyId = company.data?.id ?? null;
 
   const tickets = useQuery({
-    queryKey: ["tickets", companyId],
+    queryKey: ["tickets", companyId, { priority, status, search, page }],
     enabled: !!companyId,
+    placeholderData: keepPreviousData,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const sel = (s: string): string => s;
+      const from = (page - 1) * PAGE_SIZE;
+      let q = supabase
         .from("tickets")
-        .select("id, ticket_no, title, branch, priority, status, requester_name, created_at")
-        .eq("company_id", companyId!)
-        .order("created_at", { ascending: false });
+        .select(
+          sel("id, ticket_no, title, branch, priority, status, requester_name, created_at"),
+          { count: "exact" },
+        )
+        .eq("company_id", companyId!);
+      if (priority !== "all") q = q.eq("priority", priority);
+      if (status !== "all") q = q.eq("status", status);
+      const term = search.trim();
+      if (term) q = q.or(`ticket_no.ilike.%${term}%,title.ilike.%${term}%`);
+      const { data, error, count } = await q
+        .order("created_at", { ascending: false })
+        .range(from, from + PAGE_SIZE - 1)
+        .returns<TicketRow[]>();
       if (error) throw error;
-      return data;
+      return { rows: data ?? [], count: count ?? 0 };
     },
   });
+
+  const ticketStats = useQuery({
+    queryKey: ["ticket-stats", companyId],
+    enabled: !!companyId,
+    queryFn: async () => {
+      const base = () =>
+        supabase
+          .from("tickets")
+          .select("id", { count: "exact", head: true })
+          .eq("company_id", companyId!);
+      const [total, open, progress, resolved] = await Promise.all([
+        base(),
+        base().eq("status", "open"),
+        base().eq("status", "progress"),
+        base().eq("status", "resolved"),
+      ]);
+      return {
+        total: total.count ?? 0,
+        open: open.count ?? 0,
+        progress: progress.count ?? 0,
+        resolved: resolved.count ?? 0,
+      };
+    },
+  });
+
 
   const branches = useQuery({
     queryKey: ["branches", companyId],
@@ -254,25 +301,16 @@ function CompanyAdminPage() {
     onError: (e: Error) => toast.error("تعذّر الإنشاء", { description: e.message }),
   });
 
-  const rows = useMemo(
-    () =>
-      (tickets.data ?? []).filter(
-        (t) =>
-          (priority === "all" || t.priority === priority) &&
-          (status === "all" || t.status === status),
-      ),
-    [tickets.data, priority, status],
-  );
+  const rows = tickets.data?.rows ?? [];
+  const totalCount = tickets.data?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  const stats = useMemo(() => {
-    const all = tickets.data ?? [];
-    return {
-      total: all.length,
-      open: all.filter((t) => t.status === "open").length,
-      progress: all.filter((t) => t.status === "progress").length,
-      resolved: all.filter((t) => t.status === "resolved").length,
-    };
-  }, [tickets.data]);
+  useEffect(() => {
+    setPage(1);
+  }, [priority, status, search]);
+
+  const stats = ticketStats.data ?? { total: 0, open: 0, progress: 0, resolved: 0 };
+
 
   const signOut = async () => {
     await qc.cancelQueries();
@@ -409,7 +447,28 @@ function CompanyAdminPage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSearch(searchInput);
+                }}
+                className="flex flex-1 min-w-[220px] gap-2"
+              >
+                <input
+                  className="field"
+                  placeholder="ابحث برقم التذكرة أو العنوان…"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  aria-label="بحث"
+                  className="grid h-11 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </form>
               <select
                 className="field w-auto"
                 value={priority}
@@ -434,7 +493,21 @@ function CompanyAdminPage() {
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                onClick={() => {
+                  void qc.invalidateQueries({ queryKey: ["tickets", companyId] });
+                  void qc.invalidateQueries({ queryKey: ["ticket-stats", companyId] });
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-bold"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${tickets.isFetching ? "animate-spin" : ""}`}
+                />
+                تحديث
+              </button>
             </div>
+
 
             <div className="overflow-x-auto rounded-2xl border border-border bg-card">
               <table className="w-full text-right text-sm">
