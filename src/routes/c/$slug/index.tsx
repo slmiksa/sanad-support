@@ -120,7 +120,8 @@ function TenantPortal() {
                 متابعة سجل تذاكرك السابقة.
               </p>
               <Link
-                to="/auth"
+                to="/c/$slug/login"
+                params={{ slug }}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground"
               >
                 <LogIn className="h-4 w-4" /> تسجيل الدخول لرفع تذكرة

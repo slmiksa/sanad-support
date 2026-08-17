@@ -388,7 +388,7 @@ function SuperAdminPage() {
                   <Row k="Tracking" v={`/c/${details.data.company.slug}/track`} />
                   <Row k="Admin panel" v={`/c/${details.data.company.slug}/admin`} />
                   <Row k="Employee portal" v={`/c/${details.data.company.slug}/me`} />
-                  <Row k="Login" v={`/auth`} />
+                  <Row k="Login" v={`/c/${details.data.company.slug}/login`} />
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-border">
@@ -531,7 +531,7 @@ function buildAccessText(
     `Tracking URL: ${origin}/c/${c.slug}/track`,
     `Admin panel: ${origin}/c/${c.slug}/admin`,
     `Employee portal: ${origin}/c/${c.slug}/me`,
-    `Login page: ${origin}/auth`,
+    `Login page: ${origin}/c/${c.slug}/login`,
     ``,
     `Admin name: ${c.admin_name}`,
     `Admin email: ${c.admin_email}`,
@@ -556,7 +556,7 @@ function buildCompanyText(
     `Tracking URL: ${origin}/c/${data.company.slug}/track`,
     `Admin panel: ${origin}/c/${data.company.slug}/admin`,
     `Employee portal: ${origin}/c/${data.company.slug}/me`,
-    `Login page: ${origin}/auth`,
+    `Login page: ${origin}/c/${data.company.slug}/login`,
     ``,
     `Accounts:`,
   ];
