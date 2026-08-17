@@ -6,7 +6,7 @@ import { ChevronDown, Loader2, LogOut, Paperclip, Send, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
-import { buildFieldConfig, customFields, isEnabled } from "@/lib/company-settings";
+import { COMPANY_SELECT, buildFieldConfig, customFields, isEnabled } from "@/lib/company-settings";
 import { formatSize, uploadAttachments } from "@/lib/attachments";
 import { useAccess } from "@/lib/use-access";
 import { AccessGate } from "@/components/AccessGate";
@@ -67,13 +67,14 @@ function EmployeePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, tagline, form_fields, field_config")
+        .select(COMPANY_SELECT)
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
+
 
   const profile = useQuery({
     queryKey: ["my-profile", access.user?.id],
