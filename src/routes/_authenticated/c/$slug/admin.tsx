@@ -312,8 +312,10 @@ function CompanyAdminPage() {
           label: newField.label.trim(),
           enabled: true,
           custom: true,
+          core: false,
           type: newField.type,
           required: false,
+
           options: newField.options
             .split(",")
             .map((o) => o.trim())
