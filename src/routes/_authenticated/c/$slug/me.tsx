@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ChevronDown, Loader2, LogOut, Paperclip, Send, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { apiUrl } from "@/lib/api-base";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import { COMPANY_SELECT, buildFieldConfig, customFields, isEnabled } from "@/lib/company-settings";
 import { formatSize, uploadAttachments } from "@/lib/attachments";
@@ -198,8 +199,7 @@ function EmployeePage() {
 
       // إشعار فريق دعم لمحة (يُرسل فقط إذا كانت الشركة مدعومة من فريقنا)
       try {
-        const base = (import.meta.env["VITE_OTP_API_BASE"] as string | undefined) ?? "";
-        void fetch(`${base}/api/public/notify-new-ticket`, {
+        void fetch(apiUrl("/api/public/notify-new-ticket"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ticket_no: ticketNo }),

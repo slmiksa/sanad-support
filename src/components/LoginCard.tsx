@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { LogIn, Loader2, ShieldCheck, MailCheck, ArrowRight, KeyRound, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import sanadLogo from "@/assets/sanad-logo.png";
+import { apiUrl } from "@/lib/api-base";
 
 type Stage = "credentials" | "otp";
 
-const OTP_API_BASE = (import.meta.env["VITE_OTP_API_BASE"] as string | undefined) ?? "";
+
 
 async function callOtpApi(path: string, body: Record<string, unknown>) {
-  const res = await fetch(`${OTP_API_BASE}/api/public/auth-otp/${path}`, {
+  const res = await fetch(apiUrl(`/api/public/auth-otp/${path}`), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
