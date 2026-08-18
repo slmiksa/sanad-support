@@ -343,8 +343,9 @@ function LandingPage() {
                     {i + 1}
                   </span>
 
-                  <h3 className="text-sm font-black text-primary">{s.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+                  <h3 className="relative text-sm font-black text-primary">{s.title}</h3>
+                  <p className="relative mt-2 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+
                 </article>
               ))}
             </div>
