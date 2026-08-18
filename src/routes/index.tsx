@@ -336,9 +336,13 @@ function LandingPage() {
                   key={s.title}
                   className="relative overflow-hidden rounded-2xl border border-border bg-card p-6"
                 >
-                  <span className="absolute -left-2 -top-4 text-6xl font-black text-primary/10">
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 grid place-items-center text-[7rem] font-black leading-none text-primary/25 select-none"
+                  >
                     {i + 1}
                   </span>
+
                   <h3 className="text-sm font-black text-primary">{s.title}</h3>
                   <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
                 </article>
