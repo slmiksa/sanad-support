@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { apiUrl } from "@/lib/api-base";
+import { addMonths } from "@/lib/subscription";
 
 
 /**
@@ -50,6 +51,8 @@ export type CreateCompanyInput = {
   primary_color?: string;
   secondary_color?: string;
   branches?: string[];
+  /** مدة الاشتراك بالأشهر (1 - 12) */
+  subscription_months?: number;
   admin_name: string;
   admin_email: string;
   admin_password: string;
@@ -60,6 +63,9 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
     throw new Error("المسار يجب أن يكون أحرفاً إنجليزية صغيرة وأرقاماً وشرطات فقط");
   }
 
+  const months = Math.min(12, Math.max(1, Math.round(data.subscription_months ?? 12)));
+  const startsAt = new Date();
+
   const { data: company, error: companyError } = await supabase
     .from("companies")
     .insert({
@@ -69,6 +75,9 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
       plan: data.plan ?? "trial",
       primary_color: data.primary_color ?? "#2563eb",
       secondary_color: data.secondary_color ?? "#0f766e",
+      subscription_months: months,
+      subscription_starts_at: startsAt.toISOString(),
+      subscription_ends_at: addMonths(startsAt, months).toISOString(),
     })
     .select("id, slug")
     .single();
@@ -241,4 +250,41 @@ export async function createPlatformAgent({
 export async function removePlatformAgent({ data }: { data: { user_id: string } }) {
   await rpc("admin_remove_platform_agent", { _user_id: data.user_id });
   return { ok: true };
+}
+
+/** تجديد/تعديل مدة اشتراك شركة (أدمن المنصة فقط عبر RLS) */
+export async function updateSubscription({
+  data,
+}: {
+  data: { company_id: string; months: number; starts_at?: string };
+}) {
+  const months = Math.min(12, Math.max(1, Math.round(data.months)));
+  const startsAt = data.starts_at ? new Date(data.starts_at) : new Date();
+  const { error } = await supabase
+    .from("companies")
+    .update({
+      subscription_months: months,
+      subscription_starts_at: startsAt.toISOString(),
+      subscription_ends_at: addMonths(startsAt, months).toISOString(),
+      subscription_notified_at: null,
+    })
+    .eq("id", data.company_id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** تشغيل فحص الاشتراكات القاربة على الانتهاء وإرسال التنبيهات عبر Resend */
+export async function runExpiryCheck() {
+  const res = await fetch(apiUrl("/api/public/subscription-expiry/notify"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source: "admin" }),
+  });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة البريد غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) throw new Error((body["error"] as string) || "تعذّر تشغيل الفحص");
+  return { sent: Number(body["sent"] ?? 0), checked: Number(body["checked"] ?? 0) };
 }

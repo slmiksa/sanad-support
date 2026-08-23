@@ -13,6 +13,8 @@ import {
   Info,
   Headset,
   Trash2,
+  CalendarClock,
+  BellRing,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,7 +24,10 @@ import {
   listPlatformAgents,
   createPlatformAgent,
   removePlatformAgent,
+  updateSubscription,
+  runExpiryCheck,
 } from "@/lib/admin.functions";
+import { MONTH_OPTIONS, formatDate, subscriptionState } from "@/lib/subscription";
 import { useAccess } from "@/lib/use-access";
 import { AccessGate } from "@/components/AccessGate";
 import { usePlatformSettings } from "@/lib/platform";
@@ -63,6 +68,7 @@ const empty = {
   primary_color: "#2563eb",
   secondary_color: "#0f766e",
   branches: "",
+  subscription_months: 12,
   admin_name: "",
   admin_email: "",
   admin_password: "",
@@ -106,7 +112,9 @@ function SuperAdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, plan, is_active, created_at, managed_support")
+        .select(
+          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -162,6 +170,32 @@ function SuperAdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const renew = useMutation({
+    mutationFn: async ({ id, months }: { id: string; months: number }) =>
+      updateSubscription({ data: { company_id: id, months } }),
+    onSuccess: () => {
+      toast.success("تم تحديث مدة الاشتراك");
+      void qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const expiryCheck = useMutation({
+    mutationFn: runExpiryCheck,
+    onSuccess: (res) =>
+      toast.success(
+        res.sent > 0
+          ? `تم إرسال ${res.sent} تنبيه لقرب انتهاء الاشتراك`
+          : "لا توجد اشتراكات تحتاج تنبيهاً الآن",
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const expiring = (companies.data ?? []).filter((c) => {
+    const s = subscriptionState(c.subscription_ends_at);
+    return s.tone === "warn" || s.tone === "expired";
+  });
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
@@ -194,6 +228,66 @@ function SuperAdminPage() {
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
         <PlatformContactCard />
         <PlatformStaffCard />
+
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="inline-flex items-center gap-2 text-sm font-black">
+              <CalendarClock className="h-4 w-4 text-primary" />
+              اشتراكات على وشك الانتهاء (خلال 30 يوماً)
+            </h2>
+            <button
+              onClick={() => expiryCheck.mutate()}
+              disabled={expiryCheck.isPending}
+              className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-bold disabled:opacity-60"
+            >
+              {expiryCheck.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <BellRing className="h-3.5 w-3.5" />
+              )}
+              إرسال التنبيهات الآن
+            </button>
+          </div>
+
+          {expiring.length === 0 ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              لا توجد اشتراكات تنتهي خلال الشهر القادم.
+            </p>
+          ) : (
+            <ul className="mt-4 grid gap-2">
+              {expiring.map((c) => {
+                const s = subscriptionState(c.subscription_ends_at);
+                return (
+                  <li
+                    key={c.id}
+                    className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 text-xs ${
+                      s.tone === "expired"
+                        ? "border-destructive/40 bg-destructive/10"
+                        : "border-primary/30 bg-primary/5"
+                    }`}
+                  >
+                    <span className="font-black">{c.name}</span>
+                    <span className="text-muted-foreground">
+                      ينتهي في {formatDate(c.subscription_ends_at)} — {s.label}
+                    </span>
+                    <button
+                      onClick={() =>
+                        renew.mutate({ id: c.id, months: c.subscription_months ?? 12 })
+                      }
+                      disabled={renew.isPending}
+                      className="rounded-lg bg-primary px-3 py-1.5 font-bold text-primary-foreground disabled:opacity-60"
+                    >
+                      تجديد {c.subscription_months ?? 12} شهر
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            يتم إرسال تنبيه بريدي تلقائي لأدمن الشركة قبل 30 يوماً من انتهاء الاشتراك.
+          </p>
+        </section>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
@@ -250,6 +344,21 @@ function SuperAdminPage() {
                 <option value="basic">أساسية</option>
                 <option value="pro">احترافية</option>
                 <option value="enterprise">مؤسسات</option>
+              </select>
+            </F>
+            <F label="مدة الاشتراك">
+              <select
+                className="field"
+                value={form.subscription_months}
+                onChange={(e) =>
+                  setForm({ ...form, subscription_months: Number(e.target.value) })
+                }
+              >
+                {MONTH_OPTIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {m} {m === 1 ? "شهر" : m === 2 ? "شهران" : m <= 10 ? "أشهر" : "شهراً"}
+                  </option>
+                ))}
               </select>
             </F>
             <F label="اللون الأساسي">
@@ -436,6 +545,7 @@ function SuperAdminPage() {
                 <th className="p-3">المسار</th>
                 <th className="p-3">الباقة</th>
                 <th className="p-3">الحالة</th>
+                <th className="p-3">الاشتراك</th>
                 <th className="p-3">نوع الدعم</th>
                 <th className="p-3">روابط</th>
               </tr>
@@ -459,6 +569,50 @@ function SuperAdminPage() {
                     >
                       {c.is_active ? "مفعّلة" : "موقوفة"}
                     </button>
+                  </td>
+                  <td className="p-3">
+                    <div className="space-y-1 text-[11px] leading-5">
+                      <div className="text-muted-foreground">
+                        من {formatDate(c.subscription_starts_at)}
+                      </div>
+                      <div className="text-muted-foreground">
+                        إلى {formatDate(c.subscription_ends_at)}
+                      </div>
+                      {(() => {
+                        const s = subscriptionState(c.subscription_ends_at);
+                        return (
+                          <span
+                            className={`inline-block rounded-md px-2 py-0.5 font-bold ${
+                              s.tone === "expired"
+                                ? "bg-destructive/10 text-destructive"
+                                : s.tone === "warn"
+                                  ? "bg-amber-500/15 text-amber-600"
+                                  : s.tone === "ok"
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {s.label}
+                          </span>
+                        );
+                      })()}
+                      <select
+                        className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1 text-[11px]"
+                        value=""
+                        onChange={(e) => {
+                          const months = Number(e.target.value);
+                          if (months) renew.mutate({ id: c.id, months });
+                          e.target.value = "";
+                        }}
+                      >
+                        <option value="">تجديد الاشتراك…</option>
+                        {MONTH_OPTIONS.map((m) => (
+                          <option key={m} value={m}>
+                            {m} شهر من اليوم
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </td>
                   <td className="p-3">
                     <button

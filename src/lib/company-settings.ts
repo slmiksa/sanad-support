@@ -1,6 +1,6 @@
 /** أعمدة الشركة المستخدمة في كل الشاشات — موحّدة لضمان تطابق الحقول بين اللوحة ونموذج الموظف */
 export const COMPANY_SELECT =
-  "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config, managed_support";
+  "id, name, slug, tagline, logo_url, primary_color, secondary_color, form_fields, field_config, managed_support, subscription_starts_at, subscription_ends_at, subscription_months";
 
 export type FormFields = {
 
