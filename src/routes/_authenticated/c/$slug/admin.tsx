@@ -17,9 +17,11 @@ import {
   Users,
   Headset,
   KeyRound,
+  CalendarClock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { formatDate, subscriptionState } from "@/lib/subscription";
 import { createCompanyMember, setMemberPassword } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
