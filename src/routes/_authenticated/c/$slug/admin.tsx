@@ -16,10 +16,11 @@ import {
   Trash2,
   Users,
   Headset,
+  KeyRound,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { createCompanyMember } from "@/lib/admin.functions";
+import { createCompanyMember, setMemberPassword } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
   COMPANY_SELECT,
@@ -1051,6 +1052,28 @@ function MembersSection({
   hint: string;
   rows: MemberRow[];
 }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const save = async (id: string) => {
+    if (password.length < 8) {
+      toast.error("كلمة المرور يجب ألا تقل عن 8 أحرف");
+      return;
+    }
+    setBusy(true);
+    try {
+      await setMemberPassword({ data: { user_id: id, password } });
+      toast.success("تم تغيير كلمة المرور");
+      setOpenId(null);
+      setPassword("");
+    } catch (e) {
+      toast.error("تعذّر تغيير كلمة المرور", { description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
@@ -1072,11 +1095,12 @@ function MembersSection({
               <th className="p-3">التحويلة</th>
               <th className="p-3">التخصص</th>
               <th className="p-3">القسم</th>
+              <th className="p-3">كلمة المرور</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((m) => (
-              <tr key={m.id} className="border-t border-border">
+              <tr key={m.id} className="border-t border-border align-top">
                 <td className="p-3 font-bold">{m.full_name || "—"}</td>
                 <td className="p-3 text-xs" dir="ltr">
                   {m.email}
@@ -1085,11 +1109,55 @@ function MembersSection({
                 <td className="p-3 text-xs">{m.extension || "—"}</td>
                 <td className="p-3 text-xs">{m.specialty || "—"}</td>
                 <td className="p-3 text-xs">{m.department || "—"}</td>
+                <td className="p-3">
+                  {openId === m.id ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="text"
+                        dir="ltr"
+                        autoFocus
+                        placeholder="كلمة مرور جديدة"
+                        className="field h-9 w-40 text-left text-xs"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void save(m.id)}
+                        className="rounded-lg bg-primary px-3 py-2 text-[11px] font-black text-primary-foreground disabled:opacity-60"
+                      >
+                        {busy ? "جارٍ..." : "حفظ"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenId(null);
+                          setPassword("");
+                        }}
+                        className="rounded-lg border border-border px-3 py-2 text-[11px] font-bold text-muted-foreground"
+                      >
+                        إلغاء
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenId(m.id);
+                        setPassword("");
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-[11px] font-bold text-muted-foreground transition hover:text-foreground"
+                    >
+                      <KeyRound className="h-3 w-3" /> تغيير
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-6 text-center text-xs text-muted-foreground">
+                <td colSpan={7} className="p-6 text-center text-xs text-muted-foreground">
                   لا توجد عضويات في هذا القسم بعد.
                 </td>
               </tr>

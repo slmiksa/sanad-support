@@ -185,6 +185,30 @@ export async function resetMemberPassword({ data }: { data: { email: string } })
 }
 
 
+/** تغيير كلمة مرور عضوية مباشرة من لوحة تحكم الشركة (لمشرفي الشركة والأدمن الأم) */
+export async function setMemberPassword({
+  data,
+}: {
+  data: { user_id: string; password: string };
+}) {
+  const { data: session } = await supabase.auth.getSession();
+  const token = session.session?.access_token;
+  if (!token) throw new Error("انتهت الجلسة، سجّل الدخول مجدداً");
+
+  const res = await fetch(apiUrl("/api/public/admin-password/set"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة الحسابات غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) throw new Error((body["error"] as string) || "تعذّر تغيير كلمة المرور");
+  return { ok: true };
+}
+
 export type PlatformAgent = {
   user_id: string;
   created_at: string;
