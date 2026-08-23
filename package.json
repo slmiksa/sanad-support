@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:static": "env -u DEV_SERVER__PROJECT_PATH -u LOVABLE_SANDBOX vite build --config vite.selfhost.config.ts && node scripts/finalize-static.mjs",
-    "build:selfhost": "bash scripts/build-selfhost.sh"
+    "build:selfhost": "bash scripts/build-selfhost.sh",
+    "deploy:server": "bash scripts/deploy-static.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
