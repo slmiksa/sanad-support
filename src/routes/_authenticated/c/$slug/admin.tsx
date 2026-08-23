@@ -438,6 +438,13 @@ function CompanyAdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+        {company.data?.subscription_ends_at && (
+          <SubscriptionCard
+            startsAt={company.data.subscription_starts_at}
+            endsAt={company.data.subscription_ends_at}
+            months={company.data.subscription_months}
+          />
+        )}
         {company.data?.managed_support && (
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-primary/30 bg-primary/10 p-4">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/20 text-primary">
