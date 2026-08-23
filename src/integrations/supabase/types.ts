@@ -61,6 +61,9 @@ export type Database = {
           secondary_color: string
           slug: string
           subscription_ends_at: string | null
+          subscription_months: number
+          subscription_notified_at: string | null
+          subscription_starts_at: string
           tagline: string
           updated_at: string
         }
@@ -78,6 +81,9 @@ export type Database = {
           secondary_color?: string
           slug: string
           subscription_ends_at?: string | null
+          subscription_months?: number
+          subscription_notified_at?: string | null
+          subscription_starts_at?: string
           tagline?: string
           updated_at?: string
         }
@@ -95,6 +101,9 @@ export type Database = {
           secondary_color?: string
           slug?: string
           subscription_ends_at?: string | null
+          subscription_months?: number
+          subscription_notified_at?: string | null
+          subscription_starts_at?: string
           tagline?: string
           updated_at?: string
         }
@@ -453,6 +462,7 @@ export type Database = {
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       requires_two_factor: { Args: { _user_id: string }; Returns: boolean }
       run_keepalive: { Args: never; Returns: undefined }
+      run_subscription_expiry_check: { Args: never; Returns: undefined }
       track_ticket_public: { Args: { _ticket_no: string }; Returns: Json }
     }
     Enums: {
