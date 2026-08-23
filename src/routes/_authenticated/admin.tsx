@@ -112,7 +112,9 @@ function SuperAdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
-        .select("id, name, slug, plan, is_active, created_at, managed_support")
+        .select(
+          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
