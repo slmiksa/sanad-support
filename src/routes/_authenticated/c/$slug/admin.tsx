@@ -1051,6 +1051,28 @@ function MembersSection({
   hint: string;
   rows: MemberRow[];
 }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const save = async (id: string) => {
+    if (password.length < 8) {
+      toast.error("كلمة المرور يجب ألا تقل عن 8 أحرف");
+      return;
+    }
+    setBusy(true);
+    try {
+      await setMemberPassword({ data: { user_id: id, password } });
+      toast.success("تم تغيير كلمة المرور");
+      setOpenId(null);
+      setPassword("");
+    } catch (e) {
+      toast.error("تعذّر تغيير كلمة المرور", { description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
