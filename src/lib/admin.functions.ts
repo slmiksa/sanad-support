@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { apiUrl } from "@/lib/api-base";
+import { addMonths } from "@/lib/subscription";
 
 
 /**
