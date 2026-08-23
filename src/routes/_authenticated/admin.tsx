@@ -571,6 +571,50 @@ function SuperAdminPage() {
                     </button>
                   </td>
                   <td className="p-3">
+                    <div className="space-y-1 text-[11px] leading-5">
+                      <div className="text-muted-foreground">
+                        من {formatDate(c.subscription_starts_at)}
+                      </div>
+                      <div className="text-muted-foreground">
+                        إلى {formatDate(c.subscription_ends_at)}
+                      </div>
+                      {(() => {
+                        const s = subscriptionState(c.subscription_ends_at);
+                        return (
+                          <span
+                            className={`inline-block rounded-md px-2 py-0.5 font-bold ${
+                              s.tone === "expired"
+                                ? "bg-destructive/10 text-destructive"
+                                : s.tone === "warn"
+                                  ? "bg-amber-500/15 text-amber-600"
+                                  : s.tone === "ok"
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {s.label}
+                          </span>
+                        );
+                      })()}
+                      <select
+                        className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1 text-[11px]"
+                        value=""
+                        onChange={(e) => {
+                          const months = Number(e.target.value);
+                          if (months) renew.mutate({ id: c.id, months });
+                          e.target.value = "";
+                        }}
+                      >
+                        <option value="">تجديد الاشتراك…</option>
+                        {MONTH_OPTIONS.map((m) => (
+                          <option key={m} value={m}>
+                            {m} شهر من اليوم
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                  <td className="p-3">
                     <button
                       onClick={() =>
                         toggleManaged.mutate({ id: c.id, managed: !c.managed_support })
