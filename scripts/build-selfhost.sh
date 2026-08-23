@@ -32,6 +32,13 @@ if [ ! -f "dist/server/index.mjs" ]; then
   exit 1
 fi
 
+# لا يكفي وجود الملف: يجب أن يكون خادم Node فعلياً، لا Cloudflare Worker module.
+if ! grep -q 'node-server' dist/nitro.json 2>/dev/null; then
+  echo "!! فشل البناء: الناتج ليس بخادم Node.js (Nitro node-server)" >&2
+  echo "!! لا ترفع هذا الناتج؛ نقاط OTP والإشعارات لن تعمل." >&2
+  exit 1
+fi
+
 echo "==> 3/4 تجهيز ملفات التشغيل"
 
 cat > dist/start.sh <<'EOS'
