@@ -161,15 +161,27 @@ export async function getCompanyAccess({ data }: { data: { company_id: string } 
 }
 
 /**
- * إرسال رابط إعادة تعيين كلمة المرور للعضو (لا يحتاج خادم).
+ * إرسال رابط إعادة تعيين كلمة المرور للعضو عبر Resend
+ * (رابط يفتح صفحة /reset-password داخل النظام).
  */
 export async function resetMemberPassword({ data }: { data: { email: string } }) {
-  const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-    redirectTo: `${window.location.origin}/auth`,
+  const res = await fetch(apiUrl("/api/public/auth-reset/send"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: data.email,
+      origin: typeof window !== "undefined" ? window.location.origin : undefined,
+    }),
   });
-  if (error) throw new Error(error.message);
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة البريد غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) throw new Error((body["error"] as string) || "تعذّر إرسال الرابط");
   return { ok: true, email: data.email };
 }
+
 
 export type PlatformAgent = {
   user_id: string;
