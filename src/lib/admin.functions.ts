@@ -62,6 +62,9 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
     throw new Error("المسار يجب أن يكون أحرفاً إنجليزية صغيرة وأرقاماً وشرطات فقط");
   }
 
+  const months = Math.min(12, Math.max(1, Math.round(data.subscription_months ?? 12)));
+  const startsAt = new Date();
+
   const { data: company, error: companyError } = await supabase
     .from("companies")
     .insert({
@@ -71,6 +74,9 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
       plan: data.plan ?? "trial",
       primary_color: data.primary_color ?? "#2563eb",
       secondary_color: data.secondary_color ?? "#0f766e",
+      subscription_months: months,
+      subscription_starts_at: startsAt.toISOString(),
+      subscription_ends_at: addMonths(startsAt, months).toISOString(),
     })
     .select("id, slug")
     .single();
