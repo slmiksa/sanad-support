@@ -251,3 +251,40 @@ export async function removePlatformAgent({ data }: { data: { user_id: string } 
   await rpc("admin_remove_platform_agent", { _user_id: data.user_id });
   return { ok: true };
 }
+
+/** تجديد/تعديل مدة اشتراك شركة (أدمن المنصة فقط عبر RLS) */
+export async function updateSubscription({
+  data,
+}: {
+  data: { company_id: string; months: number; starts_at?: string };
+}) {
+  const months = Math.min(12, Math.max(1, Math.round(data.months)));
+  const startsAt = data.starts_at ? new Date(data.starts_at) : new Date();
+  const { error } = await supabase
+    .from("companies")
+    .update({
+      subscription_months: months,
+      subscription_starts_at: startsAt.toISOString(),
+      subscription_ends_at: addMonths(startsAt, months).toISOString(),
+      subscription_notified_at: null,
+    })
+    .eq("id", data.company_id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** تشغيل فحص الاشتراكات القاربة على الانتهاء وإرسال التنبيهات عبر Resend */
+export async function runExpiryCheck() {
+  const res = await fetch(apiUrl("/api/public/subscription-expiry/notify"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source: "admin" }),
+  });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة البريد غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) throw new Error((body["error"] as string) || "تعذّر تشغيل الفحص");
+  return { sent: Number(body["sent"] ?? 0), checked: Number(body["checked"] ?? 0) };
+}
