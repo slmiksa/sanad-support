@@ -286,6 +286,21 @@ function SuperAdminPage() {
                 <option value="enterprise">مؤسسات</option>
               </select>
             </F>
+            <F label="مدة الاشتراك">
+              <select
+                className="field"
+                value={form.subscription_months}
+                onChange={(e) =>
+                  setForm({ ...form, subscription_months: Number(e.target.value) })
+                }
+              >
+                {MONTH_OPTIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {m} {m === 1 ? "شهر" : m === 2 ? "شهران" : m <= 10 ? "أشهر" : "شهراً"}
+                  </option>
+                ))}
+              </select>
+            </F>
             <F label="اللون الأساسي">
               <input
                 type="color"
