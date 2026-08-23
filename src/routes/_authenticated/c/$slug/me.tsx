@@ -197,16 +197,18 @@ function EmployeePage() {
       });
       if (error) throw error;
 
-      // إشعار فريق دعم لمحة (يُرسل فقط إذا كانت الشركة مدعومة من فريقنا)
+      // إشعار فريق الدعم (لا يعطّل رفع التذكرة عند فشله)
       try {
-        void fetch(apiUrl("/api/public/notify-new-ticket"), {
+        await fetch(apiUrl("/api/public/notify-new-ticket"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ticket_no: ticketNo }),
+          keepalive: true,
         });
       } catch {
         /* الإشعار لا يعطّل رفع التذكرة */
       }
+
 
       return ticketNo;
     },
