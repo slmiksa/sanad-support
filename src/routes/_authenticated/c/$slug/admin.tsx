@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { createCompanyMember } from "@/lib/admin.functions";
+import { createCompanyMember, setMemberPassword } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
   COMPANY_SELECT,
