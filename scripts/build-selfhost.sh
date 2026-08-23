@@ -3,7 +3,7 @@
 #  نظام سند للدعم الفني — سكربت بناء النسخة الذاتية (Node.js)
 #  الاستخدام على سيرفرك:  bash scripts/build-selfhost.sh
 #  الناتج: مجلد dist/ جاهز للنسخ:
-#          cp -r dist/* /home/xxxxx.com/public_html/
+#          cp -a dist/. /home/xxxxx.com/public_html/
 # ==========================================================
 set -euo pipefail
 
@@ -17,12 +17,18 @@ echo "==> 1/4 تثبيت الاعتماديات ($PM)"
 $PM install
 
 echo "==> 2/4 البناء بهدف Node.js"
-rm -rf dist
+rm -rf dist .output
 export NITRO_PRESET="node-server"
 npx vite build --config vite.config.ts
 
+# Nitro ينشئ نسخة Node داخل .output؛ نوحّد الاسم إلى dist لتبسيط النشر.
+if [ -f ".output/server/index.mjs" ]; then
+  mv .output dist
+fi
+
 if [ ! -f "dist/server/index.mjs" ]; then
-  echo "!! فشل البناء: لم يتم إنشاء dist/server/index.mjs" >&2
+  echo "!! فشل البناء: لم يتم العثور على .output/server/index.mjs أو dist/server/index.mjs" >&2
+  echo "!! تأكد أنك شغّلت npm run build:selfhost وليس npm run build أو build:static" >&2
   exit 1
 fi
 

@@ -19,6 +19,10 @@
 
 الناتج: مجلد dist/ يحتوي خادم Node وواجهة الموقع.
 
+إذا انتهى الأمر بعبارة Generated .output/nitro.json فقط، فهذا ناتج البناء
+الخام. سكربت build:selfhost ينقل .output تلقائياً إلى dist ويضيف ملفات التشغيل.
+يجب أن ترى في النهاية: "الناتج جاهز في: .../dist".
+
 3) الرفع
 --------
   cp -a dist/. /home/your-domain.com/public_html/
