@@ -545,6 +545,7 @@ function SuperAdminPage() {
                 <th className="p-3">المسار</th>
                 <th className="p-3">الباقة</th>
                 <th className="p-3">الحالة</th>
+                <th className="p-3">الاشتراك</th>
                 <th className="p-3">نوع الدعم</th>
                 <th className="p-3">روابط</th>
               </tr>
