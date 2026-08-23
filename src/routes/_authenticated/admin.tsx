@@ -170,6 +170,32 @@ function SuperAdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const renew = useMutation({
+    mutationFn: async ({ id, months }: { id: string; months: number }) =>
+      updateSubscription({ data: { company_id: id, months } }),
+    onSuccess: () => {
+      toast.success("تم تحديث مدة الاشتراك");
+      void qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const expiryCheck = useMutation({
+    mutationFn: runExpiryCheck,
+    onSuccess: (res) =>
+      toast.success(
+        res.sent > 0
+          ? `تم إرسال ${res.sent} تنبيه لقرب انتهاء الاشتراك`
+          : "لا توجد اشتراكات تحتاج تنبيهاً الآن",
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const expiring = (companies.data ?? []).filter((c) => {
+    const s = subscriptionState(c.subscription_ends_at);
+    return s.tone === "warn" || s.tone === "expired";
+  });
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
