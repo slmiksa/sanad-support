@@ -13,6 +13,8 @@ import {
   Info,
   Headset,
   Trash2,
+  CalendarClock,
+  BellRing,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,7 +24,10 @@ import {
   listPlatformAgents,
   createPlatformAgent,
   removePlatformAgent,
+  updateSubscription,
+  runExpiryCheck,
 } from "@/lib/admin.functions";
+import { MONTH_OPTIONS, formatDate, subscriptionState } from "@/lib/subscription";
 import { useAccess } from "@/lib/use-access";
 import { AccessGate } from "@/components/AccessGate";
 import { usePlatformSettings } from "@/lib/platform";
