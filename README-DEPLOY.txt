@@ -1,36 +1,59 @@
-نظام سند للدعم الفني — النشر على استضافة عادية (بدون Node)
-==========================================================
+نظام سند للدعم الفني — النشر الكامل مع البريد والمصادقة الثنائية
+===============================================================
 
-النسخة الثابتة (Static SPA) تعمل على أي استضافة تدعم Apache/Nginx فقط،
-كل المنطق يتم في المتصفح مباشرة مع Supabase.
+المصادقة الثنائية وإشعارات التذاكر تعمل من نقاط API خادمية. لذلك النسخة
+الكاملة تحتاج استضافة Node.js؛ رفع ملفات HTML الثابتة وحدها لا يشغّل البريد.
 
 1) المتطلبات
 ------------
-- Node.js على جهازك أو على السيرفر (للبناء فقط، ليس للتشغيل)
-- ملف .env في جذر المشروع يحتوي:
+- Node.js 20 أو أحدث على السيرفر
+- ملف .env في جذر المشروع وقت البناء يحتوي قيم VITE التالية:
 
   VITE_SUPABASE_URL=https://xxxx.supabase.co
   VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
 
-2) البناء
----------
+2) بناء النسخة الكاملة
+----------------------
   npm install
-  npm run build:static
+  npm run build:selfhost
 
-الناتج: مجلد dist/ يحتوي index.html + assets + .htaccess
+الناتج: مجلد dist/ يحتوي خادم Node وواجهة الموقع.
 
 3) الرفع
 --------
-  cp -r dist/* /home/your-domain.com/public_html/
+  cp -a dist/. /home/your-domain.com/public_html/
 
-تأكد أن ملف .htaccess انتقل أيضاً (ملف مخفي):
-  cp dist/.htaccess /home/your-domain.com/public_html/
+أنشئ ملف التشغيل من القالب وأدخل مفاتيح الخادم:
+  cd /home/your-domain.com/public_html
+  cp .env.example .env
+  nano .env
+
+القيم المطلوبة داخل .env:
+  SUPABASE_URL=https://xxxx.supabase.co
+  SUPABASE_PUBLISHABLE_KEY=...
+  SUPABASE_SERVICE_ROLE_KEY=...
+  RESEND_API_KEY=...
+
+لا تضع هذه القيم في ملفات الواجهة أو داخل VITE_.
+
+شغّل التطبيق:
+  bash start.sh
+
+أو عبر PM2:
+  pm2 start server/index.mjs --name sanad
+  pm2 save
 
 4) ملاحظات
 ----------
-- ملف .htaccess ضروري ليعمل التوجيه الداخلي (مسارات مثل /c/company/admin).
-- إن كنت على Nginx استخدم بدلاً منه:
-    location / { try_files $uri $uri/ /index.html; }
+- وجّه الدومين عبر Reverse Proxy إلى المنفذ 3000.
+- في cPanel اختر Setup Node.js App واجعل Startup file = app.js.
 - إعادة تعيين كلمة مرور الأعضاء تتم عبر رابط يُرسل لبريد العضو.
 - تأكد من إضافة رابط موقعك في Supabase > Authentication > URL Configuration
   ضمن Site URL و Redirect URLs.
+
+تنبيه حول build:static
+----------------------
+الأمر npm run build:static مخصص للعرض الثابت فقط ولا يحتوي خادم API. عند
+استخدامه ستُرسل طلبات البريد إلى https://sanad.lamhasec.com، ولا تعمل إلا
+إذا كانت نسخة Node المنشورة هناك تعمل وتسمح بالطلبات. للنظام المستقل استخدم
+دائماً npm run build:selfhost.
