@@ -19,7 +19,8 @@ $PM install
 echo "==> 2/4 البناء بهدف Node.js"
 rm -rf dist .output
 export NITRO_PRESET="node-server"
-npx vite build --config vite.config.ts
+# نفصل البناء الذاتي عن متغيرات بيئة محرر Lovable حتى لا يفرض هدف Cloudflare.
+env -u LOVABLE_SANDBOX -u DEV_SERVER__PROJECT_PATH npx vite build --config vite.config.ts
 
 # Nitro ينشئ نسخة Node داخل .output؛ نوحّد الاسم إلى dist لتبسيط النشر.
 if [ -f ".output/server/index.mjs" ]; then
