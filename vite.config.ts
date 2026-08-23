@@ -7,6 +7,12 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // The shared Lovable config defaults production builds to Cloudflare.
+  // Self-host builds must override that default explicitly; exporting
+  // NITRO_PRESET alone is not consumed by the shared config.
+  ...(process.env["NITRO_PRESET"] === "node-server"
+    ? { nitro: { preset: "node-server" } }
+    : {}),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

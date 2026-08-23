@@ -19,7 +19,8 @@ $PM install
 echo "==> 2/4 البناء بهدف Node.js"
 rm -rf dist .output
 export NITRO_PRESET="node-server"
-npx vite build --config vite.config.ts
+# نفصل البناء الذاتي عن متغيرات بيئة محرر Lovable حتى لا يفرض هدف Cloudflare.
+env -u LOVABLE_SANDBOX -u DEV_SERVER__PROJECT_PATH npx vite build --config vite.config.ts
 
 # Nitro ينشئ نسخة Node داخل .output؛ نوحّد الاسم إلى dist لتبسيط النشر.
 if [ -f ".output/server/index.mjs" ]; then
@@ -29,6 +30,13 @@ fi
 if [ ! -f "dist/server/index.mjs" ]; then
   echo "!! فشل البناء: لم يتم العثور على .output/server/index.mjs أو dist/server/index.mjs" >&2
   echo "!! تأكد أنك شغّلت npm run build:selfhost وليس npm run build أو build:static" >&2
+  exit 1
+fi
+
+# لا يكفي وجود الملف: يجب أن يكون خادم Node فعلياً، لا Cloudflare Worker module.
+if ! grep -q 'node-server' dist/nitro.json 2>/dev/null; then
+  echo "!! فشل البناء: الناتج ليس بخادم Node.js (Nitro node-server)" >&2
+  echo "!! لا ترفع هذا الناتج؛ نقاط OTP والإشعارات لن تعمل." >&2
   exit 1
 fi
 

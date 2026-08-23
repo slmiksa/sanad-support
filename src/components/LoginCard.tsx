@@ -8,14 +8,16 @@ import { apiUrl } from "@/lib/api-base";
 
 type Stage = "credentials" | "otp";
 
-
-
 async function callOtpApi(path: string, body: Record<string, unknown>) {
   const res = await fetch(apiUrl(`/api/public/auth-otp/${path}`), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة التحقق غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) throw new Error((data["error"] as string) || "تعذّر إتمام العملية");
   return data;
@@ -177,7 +179,9 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
 
                 <form onSubmit={submitCredentials} className="mt-6 space-y-4">
                   <label className="block space-y-1.5">
-                    <span className="text-xs font-bold text-muted-foreground">البريد الإلكتروني</span>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      البريد الإلكتروني
+                    </span>
                     <div className="relative">
                       <Mail className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <input
@@ -217,7 +221,6 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
                     دخول
                   </button>
                 </form>
-
               </>
             ) : (
               <>
