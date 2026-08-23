@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
 import { Route as ApiPublicAuthOtpSendRouteImport } from './routes/api/public/auth-otp/send'
 import { Route as ApiPublicAuthOtpVerifyRouteImport } from './routes/api/public/auth-otp/verify'
+import { Route as ApiPublicAuthResetSendRouteImport } from './routes/api/public/auth-reset/send'
 import { Route as AuthenticatedCSlugTicketsTicketIdRouteImport } from './routes/_authenticated/c/$slug/tickets/$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -37,6 +39,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -95,6 +102,11 @@ const ApiPublicAuthOtpVerifyRoute = ApiPublicAuthOtpVerifyRouteImport.update({
   path: '/api/public/auth-otp/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAuthResetSendRoute = ApiPublicAuthResetSendRouteImport.update({
+  id: '/api/public/auth-reset/send',
+  path: '/api/public/auth-reset/send',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCSlugTicketsTicketIdRoute =
   AuthenticatedCSlugTicketsTicketIdRouteImport.update({
     id: '/c/$slug/tickets/$ticketId',
@@ -105,6 +117,7 @@ const AuthenticatedCSlugTicketsTicketIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
@@ -116,11 +129,13 @@ export interface FileRoutesByFullPath {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/support': typeof AuthenticatedSupportRoute
@@ -132,6 +147,7 @@ export interface FileRoutesByTo {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesById {
@@ -139,6 +155,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
@@ -150,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/_authenticated/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRouteTypes {
@@ -157,6 +175,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/admin'
     | '/portal'
     | '/support'
@@ -168,11 +187,13 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/c/$slug/tickets/$ticketId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/admin'
     | '/portal'
     | '/support'
@@ -184,12 +205,14 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/c/$slug/tickets/$ticketId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/reset-password'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
     | '/_authenticated/support'
@@ -201,6 +224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/_authenticated/c/$slug/tickets/$ticketId'
   fileRoutesById: FileRoutesById
 }
@@ -208,12 +232,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicNotifyNewTicketRoute: typeof ApiPublicNotifyNewTicketRoute
   CSlugLoginRoute: typeof CSlugLoginRoute
   CSlugTrackRoute: typeof CSlugTrackRoute
   CSlugIndexRoute: typeof CSlugIndexRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
   ApiPublicAuthOtpVerifyRoute: typeof ApiPublicAuthOtpVerifyRoute
+  ApiPublicAuthResetSendRoute: typeof ApiPublicAuthResetSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -237,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -316,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuthOtpVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth-reset/send': {
+      id: '/api/public/auth-reset/send'
+      path: '/api/public/auth-reset/send'
+      fullPath: '/api/public/auth-reset/send'
+      preLoaderRoute: typeof ApiPublicAuthResetSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/c/$slug/tickets/$ticketId': {
       id: '/_authenticated/c/$slug/tickets/$ticketId'
       path: '/c/$slug/tickets/$ticketId'
@@ -352,12 +392,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicNotifyNewTicketRoute: ApiPublicNotifyNewTicketRoute,
   CSlugLoginRoute: CSlugLoginRoute,
   CSlugTrackRoute: CSlugTrackRoute,
   CSlugIndexRoute: CSlugIndexRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
   ApiPublicAuthOtpVerifyRoute: ApiPublicAuthOtpVerifyRoute,
+  ApiPublicAuthResetSendRoute: ApiPublicAuthResetSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
