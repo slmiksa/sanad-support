@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { apiUrl } from "@/lib/api-base";
+
 
 /**
  * كل العمليات الإدارية تتم مباشرة من المتصفح عبر Supabase
