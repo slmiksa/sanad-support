@@ -19,7 +19,7 @@ $PM install
 echo "==> 2/4 البناء بهدف Node.js"
 rm -rf dist
 export NITRO_PRESET="node-server"
-npx vite build --config vite.selfhost.config.ts
+npx vite build --config vite.config.ts
 
 if [ ! -f "dist/server/index.mjs" ]; then
   echo "!! فشل البناء: لم يتم إنشاء dist/server/index.mjs" >&2
@@ -34,6 +34,17 @@ cat > dist/start.sh <<'EOS'
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] && set -a && . ./.env && set +a
+
+missing=()
+for name in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY RESEND_API_KEY; do
+  [ -n "${!name:-}" ] || missing+=("$name")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  echo "متغيرات الخادم الناقصة: ${missing[*]}" >&2
+  echo "انسخ .env.example إلى .env وأضف القيم ثم أعد التشغيل." >&2
+  exit 1
+fi
+
 export PORT="${PORT:-3000}"
 export HOST="${HOST:-0.0.0.0}"
 exec node server/index.mjs
@@ -62,18 +73,19 @@ HOST=0.0.0.0
 SUPABASE_URL=
 SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
 EOS
 
 cat > dist/README-DEPLOY.txt <<'EOS'
 نظام سند للدعم الفني — النشر على سيرفر Node.js
 ================================================
-1) النسخ:
-   cp -r dist/* /home/xxxxx.com/public_html/
+1) النسخ (يشمل الملفات المخفية):
+   cp -a dist/. /home/xxxxx.com/public_html/
 
 2) متغيرات البيئة:
    cd /home/xxxxx.com/public_html
    cp .env.example .env && nano .env
-   (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY / SUPABASE_SERVICE_ROLE_KEY)
+   (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY / SUPABASE_SERVICE_ROLE_KEY / RESEND_API_KEY)
 
 3) التشغيل — اختر طريقة:
    - يدوي:   bash start.sh
@@ -87,8 +99,8 @@ cat > dist/README-DEPLOY.txt <<'EOS'
    ProxyPass        /  http://127.0.0.1:3000/
    ProxyPassReverse /  http://127.0.0.1:3000/
 
-ملاحظة: النظام يحتاج Node لأن فيه دوال خادم (إنشاء الشركات
-والعضويات وتصفير كلمات المرور)؛ رفع ملفات ثابتة فقط لا يكفي.
+مهم: شغّل نسخة Node هذه، وليس npm run build:static. النسخة الثابتة لا تحتوي
+على نقاط API، ولذلك لن تعمل المصادقة الثنائية أو إشعارات البريد منها محلياً.
 EOS
 
 echo "==> 4/4 تم"

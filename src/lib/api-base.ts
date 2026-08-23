@@ -13,8 +13,7 @@ function hasLocalServer(hostname: string) {
     hostname === "127.0.0.1" ||
     hostname.endsWith(".lovable.app") ||
     hostname.endsWith(".lovableproject.com") ||
-    hostname === "sanad.lamhasec.com" ||
-    hostname.endsWith(".lamhasec.com")
+    hostname === "sanad.lamhasec.com"
   );
 }
 
