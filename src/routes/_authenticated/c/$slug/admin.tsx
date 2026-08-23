@@ -1175,3 +1175,52 @@ function MembersSection({
     </section>
   );
 }
+
+function SubscriptionCard({
+  startsAt,
+  endsAt,
+  months,
+}: {
+  startsAt: string | null;
+  endsAt: string | null;
+  months: number | null;
+}) {
+  const state = subscriptionState(endsAt);
+  const tone =
+    state.tone === "expired"
+      ? "border-destructive/40 bg-destructive/10"
+      : state.tone === "warn"
+        ? "border-amber-500/40 bg-amber-500/10"
+        : "border-border bg-card";
+
+  return (
+    <section className={`grid gap-3 rounded-2xl border p-5 sm:grid-cols-4 ${tone}`}>
+      <div className="sm:col-span-4 flex items-center gap-2 text-sm font-black">
+        <CalendarClock className="h-4 w-4 text-primary" /> اشتراك الشركة
+      </div>
+      <Info2 label="تاريخ البدء" value={formatDate(startsAt)} />
+      <Info2 label="تاريخ الانتهاء" value={formatDate(endsAt)} />
+      <Info2 label="المدة" value={months ? `${months} شهر` : "—"} />
+      <Info2 label="الحالة" value={state.label} />
+      {state.tone === "warn" && (
+        <p className="sm:col-span-4 text-xs text-muted-foreground">
+          اقترب موعد انتهاء الاشتراك — يرجى التواصل مع «لمحة الآمنة» للتجديد قبل انقطاع الخدمة.
+        </p>
+      )}
+      {state.tone === "expired" && (
+        <p className="sm:col-span-4 text-xs font-bold text-destructive">
+          انتهى الاشتراك — يرجى التجديد لاستمرار الخدمة.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function Info2({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-background/60 p-3">
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xs font-black">{value}</p>
+    </div>
+  );
+}
