@@ -101,15 +101,16 @@ export const Route = createFileRoute("/api/public/notify-new-ticket")({
             );
           };
 
-          // فريق الدعم الفني داخل الشركة الكلاينت — يصلهم الإشعار دائماً برابط مسار شركتهم
+          // فريق الدعم + إدارة الشركة الكلاينت — يصلهم الإشعار دائماً برابط مسار شركتهم
           const { data: companyAgents } = await admin
             .from("user_roles")
             .select("user_id")
-            .eq("role", "agent")
+            .in("role", ["agent", "company_admin"])
             .eq("company_id", ticket.company_id);
           const companyRecipients = await emailsOf(
             (companyAgents ?? []).map((r) => r.user_id),
           );
+
 
           // موظفو دعم لمحة — فقط إذا كانت الشركة مدعومة من فريقنا، وبرابط بوابة المنصة
           let platformRecipients: string[] = [];
