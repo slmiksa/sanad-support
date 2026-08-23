@@ -229,6 +229,66 @@ function SuperAdminPage() {
         <PlatformContactCard />
         <PlatformStaffCard />
 
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="inline-flex items-center gap-2 text-sm font-black">
+              <CalendarClock className="h-4 w-4 text-primary" />
+              اشتراكات على وشك الانتهاء (خلال 30 يوماً)
+            </h2>
+            <button
+              onClick={() => expiryCheck.mutate()}
+              disabled={expiryCheck.isPending}
+              className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-bold disabled:opacity-60"
+            >
+              {expiryCheck.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <BellRing className="h-3.5 w-3.5" />
+              )}
+              إرسال التنبيهات الآن
+            </button>
+          </div>
+
+          {expiring.length === 0 ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              لا توجد اشتراكات تنتهي خلال الشهر القادم.
+            </p>
+          ) : (
+            <ul className="mt-4 grid gap-2">
+              {expiring.map((c) => {
+                const s = subscriptionState(c.subscription_ends_at);
+                return (
+                  <li
+                    key={c.id}
+                    className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 text-xs ${
+                      s.tone === "expired"
+                        ? "border-destructive/40 bg-destructive/10"
+                        : "border-primary/30 bg-primary/5"
+                    }`}
+                  >
+                    <span className="font-black">{c.name}</span>
+                    <span className="text-muted-foreground">
+                      ينتهي في {formatDate(c.subscription_ends_at)} — {s.label}
+                    </span>
+                    <button
+                      onClick={() =>
+                        renew.mutate({ id: c.id, months: c.subscription_months ?? 12 })
+                      }
+                      disabled={renew.isPending}
+                      className="rounded-lg bg-primary px-3 py-1.5 font-bold text-primary-foreground disabled:opacity-60"
+                    >
+                      تجديد {c.subscription_months ?? 12} شهر
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            يتم إرسال تنبيه بريدي تلقائي لأدمن الشركة قبل 30 يوماً من انتهاء الاشتراك.
+          </p>
+        </section>
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-black">الشركات المشتركة</h2>
           <button
