@@ -50,6 +50,8 @@ export type CreateCompanyInput = {
   primary_color?: string;
   secondary_color?: string;
   branches?: string[];
+  /** مدة الاشتراك بالأشهر (1 - 12) */
+  subscription_months?: number;
   admin_name: string;
   admin_email: string;
   admin_password: string;
