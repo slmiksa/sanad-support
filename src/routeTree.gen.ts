@@ -23,6 +23,7 @@ import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
 import { Route as ApiPublicAuthOtpSendRouteImport } from './routes/api/public/auth-otp/send'
 import { Route as ApiPublicAuthOtpVerifyRouteImport } from './routes/api/public/auth-otp/verify'
+import { Route as ApiPublicAuthResetSendRouteImport } from './routes/api/public/auth-reset/send'
 import { Route as AuthenticatedCSlugTicketsTicketIdRouteImport } from './routes/_authenticated/c/$slug/tickets/$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -95,6 +96,11 @@ const ApiPublicAuthOtpVerifyRoute = ApiPublicAuthOtpVerifyRouteImport.update({
   path: '/api/public/auth-otp/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAuthResetSendRoute = ApiPublicAuthResetSendRouteImport.update({
+  id: '/api/public/auth-reset/send',
+  path: '/api/public/auth-reset/send',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCSlugTicketsTicketIdRoute =
   AuthenticatedCSlugTicketsTicketIdRouteImport.update({
     id: '/c/$slug/tickets/$ticketId',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesById {
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
+  '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
   '/_authenticated/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRouteTypes {
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/c/$slug/tickets/$ticketId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/c/$slug/tickets/$ticketId'
   id:
     | '__root__'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/_authenticated/c/$slug/me'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
+    | '/api/public/auth-reset/send'
     | '/_authenticated/c/$slug/tickets/$ticketId'
   fileRoutesById: FileRoutesById
 }
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   CSlugIndexRoute: typeof CSlugIndexRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
   ApiPublicAuthOtpVerifyRoute: typeof ApiPublicAuthOtpVerifyRoute
+  ApiPublicAuthResetSendRoute: typeof ApiPublicAuthResetSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuthOtpVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth-reset/send': {
+      id: '/api/public/auth-reset/send'
+      path: '/api/public/auth-reset/send'
+      fullPath: '/api/public/auth-reset/send'
+      preLoaderRoute: typeof ApiPublicAuthResetSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/c/$slug/tickets/$ticketId': {
       id: '/_authenticated/c/$slug/tickets/$ticketId'
       path: '/c/$slug/tickets/$ticketId'
@@ -358,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   CSlugIndexRoute: CSlugIndexRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
   ApiPublicAuthOtpVerifyRoute: ApiPublicAuthOtpVerifyRoute,
+  ApiPublicAuthResetSendRoute: ApiPublicAuthResetSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
