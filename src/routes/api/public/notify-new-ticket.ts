@@ -124,8 +124,18 @@ export const Route = createFileRoute("/api/public/notify-new-ticket")({
             ).filter((e) => !companyRecipients.includes(e));
           }
 
+          // احتياطي: لا يوجد أي مستلم داخل الشركة → يُبلَّغ مدير المنصة حتى لا تمرّ التذكرة بصمت
+          if (!companyRecipients.length && !platformRecipients.length) {
+            const { data: owners } = await admin
+              .from("user_roles")
+              .select("user_id")
+              .eq("role", "super_admin");
+            platformRecipients = await emailsOf((owners ?? []).map((r) => r.user_id));
+          }
+
           if (!companyRecipients.length && !platformRecipients.length)
             return json({ sent: false, reason: "no_agents" });
+
 
           const send = async (to: string[], loginUrl: string) => {
             if (!to.length) return;
