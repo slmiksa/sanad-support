@@ -26,6 +26,7 @@ import { Route as ApiPublicAdminPasswordSetRouteImport } from './routes/api/publ
 import { Route as ApiPublicAuthOtpSendRouteImport } from './routes/api/public/auth-otp/send'
 import { Route as ApiPublicAuthOtpVerifyRouteImport } from './routes/api/public/auth-otp/verify'
 import { Route as ApiPublicAuthResetSendRouteImport } from './routes/api/public/auth-reset/send'
+import { Route as ApiPublicSubscriptionExpiryNotifyRouteImport } from './routes/api/public/subscription-expiry/notify'
 import { Route as AuthenticatedCSlugTicketsTicketIdRouteImport } from './routes/_authenticated/c/$slug/tickets/$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -114,6 +115,12 @@ const ApiPublicAuthResetSendRoute = ApiPublicAuthResetSendRouteImport.update({
   path: '/api/public/auth-reset/send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSubscriptionExpiryNotifyRoute =
+  ApiPublicSubscriptionExpiryNotifyRouteImport.update({
+    id: '/api/public/subscription-expiry/notify',
+    path: '/api/public/subscription-expiry/notify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedCSlugTicketsTicketIdRoute =
   AuthenticatedCSlugTicketsTicketIdRouteImport.update({
     id: '/c/$slug/tickets/$ticketId',
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
   '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
+  '/api/public/subscription-expiry/notify': typeof ApiPublicSubscriptionExpiryNotifyRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesByTo {
@@ -157,6 +165,7 @@ export interface FileRoutesByTo {
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
   '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
+  '/api/public/subscription-expiry/notify': typeof ApiPublicSubscriptionExpiryNotifyRoute
   '/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRoutesById {
@@ -178,6 +187,7 @@ export interface FileRoutesById {
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
   '/api/public/auth-reset/send': typeof ApiPublicAuthResetSendRoute
+  '/api/public/subscription-expiry/notify': typeof ApiPublicSubscriptionExpiryNotifyRoute
   '/_authenticated/c/$slug/tickets/$ticketId': typeof AuthenticatedCSlugTicketsTicketIdRoute
 }
 export interface FileRouteTypes {
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
     | '/api/public/auth-reset/send'
+    | '/api/public/subscription-expiry/notify'
     | '/c/$slug/tickets/$ticketId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
     | '/api/public/auth-reset/send'
+    | '/api/public/subscription-expiry/notify'
     | '/c/$slug/tickets/$ticketId'
   id:
     | '__root__'
@@ -238,6 +250,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
     | '/api/public/auth-reset/send'
+    | '/api/public/subscription-expiry/notify'
     | '/_authenticated/c/$slug/tickets/$ticketId'
   fileRoutesById: FileRoutesById
 }
@@ -254,6 +267,7 @@ export interface RootRouteChildren {
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
   ApiPublicAuthOtpVerifyRoute: typeof ApiPublicAuthOtpVerifyRoute
   ApiPublicAuthResetSendRoute: typeof ApiPublicAuthResetSendRoute
+  ApiPublicSubscriptionExpiryNotifyRoute: typeof ApiPublicSubscriptionExpiryNotifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -377,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuthResetSendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/subscription-expiry/notify': {
+      id: '/api/public/subscription-expiry/notify'
+      path: '/api/public/subscription-expiry/notify'
+      fullPath: '/api/public/subscription-expiry/notify'
+      preLoaderRoute: typeof ApiPublicSubscriptionExpiryNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/c/$slug/tickets/$ticketId': {
       id: '/_authenticated/c/$slug/tickets/$ticketId'
       path: '/c/$slug/tickets/$ticketId'
@@ -422,6 +443,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
   ApiPublicAuthOtpVerifyRoute: ApiPublicAuthOtpVerifyRoute,
   ApiPublicAuthResetSendRoute: ApiPublicAuthResetSendRoute,
+  ApiPublicSubscriptionExpiryNotifyRoute:
+    ApiPublicSubscriptionExpiryNotifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
