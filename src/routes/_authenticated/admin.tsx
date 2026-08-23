@@ -68,6 +68,7 @@ const empty = {
   primary_color: "#2563eb",
   secondary_color: "#0f766e",
   branches: "",
+  subscription_months: 12,
   admin_name: "",
   admin_email: "",
   admin_password: "",
