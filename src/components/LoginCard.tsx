@@ -16,6 +16,10 @@ async function callOtpApi(path: string, body: Record<string, unknown>) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("خدمة التحقق غير متصلة بالخادم. حدّث نسخة الموقع ثم حاول مجدداً.");
+  }
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) throw new Error((data["error"] as string) || "تعذّر إتمام العملية");
   return data;
