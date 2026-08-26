@@ -22,7 +22,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, subscriptionState } from "@/lib/subscription";
-import { createCompanyMember, setMemberPassword } from "@/lib/admin.functions";
+import { createCompanyMember, deleteMember, setMemberPassword } from "@/lib/admin.functions";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
   COMPANY_SELECT,
@@ -95,6 +95,11 @@ function CompanyAdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("tickets");
+  // فني الدعم داخل الشركة يرى التذاكر فقط — بدون تقارير أو إعدادات أو عضويات
+  const canManage = access.isSuperAdmin || access.role === "company_admin";
+  useEffect(() => {
+    if (!canManage && tab !== "tickets") setTab("tickets");
+  }, [canManage, tab]);
   const [priority, setPriority] = useState<Priority | "all">("all");
   const [status, setStatus] = useState<Status | "all">("all");
   const [searchInput, setSearchInput] = useState("");
@@ -417,12 +422,14 @@ function CompanyAdminPage() {
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(
-            [
-              ["tickets", "التذاكر"],
-              ["reports", "التقارير"],
-              ["settings", "التخصيص والحقول"],
-              ["users", "العضويات"],
-            ] as [Tab, string][]
+            (canManage
+              ? [
+                  ["tickets", "التذاكر"],
+                  ["reports", "التقارير"],
+                  ["settings", "التخصيص والحقول"],
+                  ["users", "العضويات"],
+                ]
+              : [["tickets", "التذاكر"]]) as [Tab, string][]
           ).map(([key, label]) => (
             <button
               key={key}
@@ -1064,6 +1071,22 @@ function MembersSection({
   const [openId, setOpenId] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const qc = useQueryClient();
+
+  const removeMember = async (m: MemberRow) => {
+    if (!window.confirm(`سيتم حذف عضوية «${m.full_name || m.email}» نهائياً. هل أنت متأكد؟`)) return;
+    setDeletingId(m.id);
+    try {
+      await deleteMember({ data: { user_id: m.id } });
+      toast.success("تم حذف العضوية");
+      void qc.invalidateQueries({ queryKey: ["members"] });
+    } catch (e) {
+      toast.error("تعذّر حذف العضوية", { description: (e as Error).message });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const save = async (id: string) => {
     if (password.length < 8) {
@@ -1105,6 +1128,7 @@ function MembersSection({
               <th className="p-3">التخصص</th>
               <th className="p-3">القسم</th>
               <th className="p-3">كلمة المرور</th>
+              <th className="p-3">حذف</th>
             </tr>
           </thead>
           <tbody>
@@ -1162,11 +1186,21 @@ function MembersSection({
                     </button>
                   )}
                 </td>
+                <td className="p-3">
+                  <button
+                    type="button"
+                    disabled={deletingId === m.id}
+                    onClick={() => void removeMember(m)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-destructive/40 px-3 py-2 text-[11px] font-bold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
+                  >
+                    <Trash2 className="h-3 w-3" /> {deletingId === m.id ? "جارٍ..." : "حذف"}
+                  </button>
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-xs text-muted-foreground">
+                <td colSpan={8} className="p-6 text-center text-xs text-muted-foreground">
                   لا توجد عضويات في هذا القسم بعد.
                 </td>
               </tr>

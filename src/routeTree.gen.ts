@@ -22,6 +22,7 @@ import { Route as CSlugLoginRouteImport } from './routes/c/$slug/login'
 import { Route as CSlugTrackRouteImport } from './routes/c/$slug/track'
 import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authenticated/c/$slug/admin'
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
+import { Route as ApiPublicAdminMemberDeleteRouteImport } from './routes/api/public/admin-member/delete'
 import { Route as ApiPublicAdminPasswordSetRouteImport } from './routes/api/public/admin-password/set'
 import { Route as ApiPublicAuthOtpSendRouteImport } from './routes/api/public/auth-otp/send'
 import { Route as ApiPublicAuthOtpVerifyRouteImport } from './routes/api/public/auth-otp/verify'
@@ -94,6 +95,12 @@ const AuthenticatedCSlugMeRoute = AuthenticatedCSlugMeRouteImport.update({
   path: '/c/$slug/me',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicAdminMemberDeleteRoute =
+  ApiPublicAdminMemberDeleteRouteImport.update({
+    id: '/api/public/admin-member/delete',
+    path: '/api/public/admin-member/delete',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminPasswordSetRoute =
   ApiPublicAdminPasswordSetRouteImport.update({
     id: '/api/public/admin-password/set',
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -161,6 +169,7 @@ export interface FileRoutesByTo {
   '/c/$slug': typeof CSlugIndexRoute
   '/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -183,6 +192,7 @@ export interface FileRoutesById {
   '/c/$slug/': typeof CSlugIndexRoute
   '/_authenticated/c/$slug/admin': typeof AuthenticatedCSlugAdminRoute
   '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
+  '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/c/$slug/'
     | '/c/$slug/admin'
     | '/c/$slug/me'
+    | '/api/public/admin-member/delete'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/c/$slug'
     | '/c/$slug/admin'
     | '/c/$slug/me'
+    | '/api/public/admin-member/delete'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -246,6 +258,7 @@ export interface FileRouteTypes {
     | '/c/$slug/'
     | '/_authenticated/c/$slug/admin'
     | '/_authenticated/c/$slug/me'
+    | '/api/public/admin-member/delete'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -263,6 +276,7 @@ export interface RootRouteChildren {
   CSlugLoginRoute: typeof CSlugLoginRoute
   CSlugTrackRoute: typeof CSlugTrackRoute
   CSlugIndexRoute: typeof CSlugIndexRoute
+  ApiPublicAdminMemberDeleteRoute: typeof ApiPublicAdminMemberDeleteRoute
   ApiPublicAdminPasswordSetRoute: typeof ApiPublicAdminPasswordSetRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
   ApiPublicAuthOtpVerifyRoute: typeof ApiPublicAuthOtpVerifyRoute
@@ -363,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCSlugMeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/admin-member/delete': {
+      id: '/api/public/admin-member/delete'
+      path: '/api/public/admin-member/delete'
+      fullPath: '/api/public/admin-member/delete'
+      preLoaderRoute: typeof ApiPublicAdminMemberDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin-password/set': {
       id: '/api/public/admin-password/set'
       path: '/api/public/admin-password/set'
@@ -439,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   CSlugLoginRoute: CSlugLoginRoute,
   CSlugTrackRoute: CSlugTrackRoute,
   CSlugIndexRoute: CSlugIndexRoute,
+  ApiPublicAdminMemberDeleteRoute: ApiPublicAdminMemberDeleteRoute,
   ApiPublicAdminPasswordSetRoute: ApiPublicAdminPasswordSetRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
   ApiPublicAuthOtpVerifyRoute: ApiPublicAuthOtpVerifyRoute,
