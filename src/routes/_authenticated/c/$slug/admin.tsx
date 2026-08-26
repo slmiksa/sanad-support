@@ -1186,11 +1186,21 @@ function MembersSection({
                     </button>
                   )}
                 </td>
+                <td className="p-3">
+                  <button
+                    type="button"
+                    disabled={deletingId === m.id}
+                    onClick={() => void removeMember(m)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-destructive/40 px-3 py-2 text-[11px] font-bold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
+                  >
+                    <Trash2 className="h-3 w-3" /> {deletingId === m.id ? "جارٍ..." : "حذف"}
+                  </button>
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-xs text-muted-foreground">
+                <td colSpan={8} className="p-6 text-center text-xs text-muted-foreground">
                   لا توجد عضويات في هذا القسم بعد.
                 </td>
               </tr>
