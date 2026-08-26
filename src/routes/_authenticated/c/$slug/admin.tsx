@@ -1128,6 +1128,7 @@ function MembersSection({
               <th className="p-3">التخصص</th>
               <th className="p-3">القسم</th>
               <th className="p-3">كلمة المرور</th>
+              <th className="p-3">حذف</th>
             </tr>
           </thead>
           <tbody>
