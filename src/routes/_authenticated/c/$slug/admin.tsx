@@ -1071,6 +1071,22 @@ function MembersSection({
   const [openId, setOpenId] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const qc = useQueryClient();
+
+  const removeMember = async (m: MemberRow) => {
+    if (!window.confirm(`سيتم حذف عضوية «${m.full_name || m.email}» نهائياً. هل أنت متأكد؟`)) return;
+    setDeletingId(m.id);
+    try {
+      await deleteMember({ data: { user_id: m.id } });
+      toast.success("تم حذف العضوية");
+      void qc.invalidateQueries({ queryKey: ["members"] });
+    } catch (e) {
+      toast.error("تعذّر حذف العضوية", { description: (e as Error).message });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const save = async (id: string) => {
     if (password.length < 8) {
