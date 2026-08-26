@@ -422,12 +422,14 @@ function CompanyAdminPage() {
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(
-            [
-              ["tickets", "التذاكر"],
-              ["reports", "التقارير"],
-              ["settings", "التخصيص والحقول"],
-              ["users", "العضويات"],
-            ] as [Tab, string][]
+            (canManage
+              ? [
+                  ["tickets", "التذاكر"],
+                  ["reports", "التقارير"],
+                  ["settings", "التخصيص والحقول"],
+                  ["users", "العضويات"],
+                ]
+              : [["tickets", "التذاكر"]]) as [Tab, string][]
           ).map(([key, label]) => (
             <button
               key={key}
