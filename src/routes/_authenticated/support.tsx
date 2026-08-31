@@ -59,6 +59,8 @@ function PlatformSupportPage() {
   const companies = useQuery({
     queryKey: ["managed-companies"],
     enabled: allowed,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
@@ -87,6 +89,8 @@ function PlatformSupportPage() {
   const tickets = useQuery({
     queryKey: ["managed-tickets", companyId],
     enabled: allowed && !!companyId,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tickets")
@@ -245,6 +249,8 @@ function TicketPanel({ ticketId, companyId }: { ticketId: string; companyId: str
 
   const ticket = useQuery({
     queryKey: ["support-ticket", ticketId],
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tickets")
@@ -271,6 +277,8 @@ function TicketPanel({ ticketId, companyId }: { ticketId: string; companyId: str
 
   const updates = useQuery({
     queryKey: ["support-updates", ticketId],
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("ticket_updates")
