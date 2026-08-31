@@ -61,6 +61,7 @@ function PlatformSupportPage() {
     enabled: allowed,
     refetchInterval: 30_000,
     refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
@@ -91,6 +92,7 @@ function PlatformSupportPage() {
     enabled: allowed && !!companyId,
     refetchInterval: 30_000,
     refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tickets")
@@ -251,6 +253,7 @@ function TicketPanel({ ticketId, companyId }: { ticketId: string; companyId: str
     queryKey: ["support-ticket", ticketId],
     refetchInterval: 30_000,
     refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tickets")
@@ -279,6 +282,7 @@ function TicketPanel({ ticketId, companyId }: { ticketId: string; companyId: str
     queryKey: ["support-updates", ticketId],
     refetchInterval: 30_000,
     refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("ticket_updates")
