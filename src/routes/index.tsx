@@ -199,12 +199,9 @@ function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-stage-foreground/10 bg-stage/95 text-stage-foreground backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
-          <a href="/" className="flex items-center" aria-label="نظام سند للدعم الفني">
-            <img
-              src={sanadLogo}
-              alt="شعار نظام سند للدعم الفني"
-              className="h-12 w-auto brightness-0 invert sm:h-14"
-            />
+          <a href="/" className="flex items-end gap-2" aria-label="نظام سند للدعم الفني">
+            <span className="text-2xl font-black leading-none text-stage-foreground sm:text-3xl">سند<span className="text-primary">.</span></span>
+            <span className="hidden pb-0.5 text-[10px] font-bold text-stage-foreground/50 sm:inline">للدعم الفني</span>
           </a>
           <div className="flex items-center gap-2">
             <a
