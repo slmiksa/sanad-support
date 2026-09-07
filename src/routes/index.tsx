@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { usePlatformSettings, whatsappLink } from "@/lib/platform";
 import sanadLogo from "@/assets/sanad-logo.png";
+import transparentLogoAsset from "@/assets/sanad-logo-transparent.png.asset.json";
 import {
   Accordion,
   AccordionContent,
@@ -199,9 +200,9 @@ function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-stage-foreground/10 bg-stage/95 text-stage-foreground backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
-          <a href="/" className="flex items-end gap-2" aria-label="نظام سند للدعم الفني">
-            <span className="text-2xl font-black leading-none text-stage-foreground sm:text-3xl">سند<span className="text-primary">.</span></span>
-            <span className="hidden pb-0.5 text-[10px] font-bold text-stage-foreground/50 sm:inline">للدعم الفني</span>
+          <a href="/" className="flex items-center gap-2" aria-label="نظام سند للدعم الفني">
+            <img src={transparentLogoAsset.url} alt="شعار نظام سند" className="h-12 w-12 object-contain sm:h-14 sm:w-14" />
+            <span className="hidden text-[10px] font-bold leading-5 text-stage-foreground/50 sm:inline">نظام سند<br />للدعم الفني</span>
           </a>
           <div className="flex items-center gap-2">
             <a
@@ -224,34 +225,34 @@ function LandingPage() {
         <section className="relative overflow-hidden bg-stage text-stage-foreground">
           <div className="pointer-events-none absolute -left-32 top-12 h-96 w-96 rotate-12 border-[5rem] border-primary/15 brand-drift" aria-hidden />
           <div className="pointer-events-none absolute -bottom-52 right-1/3 h-96 w-96 -rotate-12 bg-primary/10 brand-drift" aria-hidden />
-          <div className="relative mx-auto grid min-h-[calc(100svh-5rem)] max-w-7xl items-center gap-10 px-5 pb-16 pt-12 lg:grid-cols-12 lg:px-8 lg:py-20">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 lg:min-h-[38rem] lg:grid-cols-12 lg:px-8 lg:py-14">
             <div className="reveal-up lg:col-span-8">
             <span className="inline-flex items-center gap-2 border-r-2 border-primary pr-3 text-xs font-bold text-primary">
               <Sparkles className="h-3.5 w-3.5" /> منصة تذاكر دعم فني متعددة الشركات
             </span>
 
-            <h1 className="mt-7 max-w-4xl text-5xl font-black leading-[1.12] sm:text-7xl lg:text-[6.5rem]">
+            <h1 className="mt-6 max-w-4xl text-4xl font-black leading-[1.18] sm:text-6xl lg:text-[5.25rem]">
               سند<span className="text-primary">.</span><br />بوابتك للحلول
             </h1>
 
-            <p className="mt-7 max-w-2xl text-sm leading-8 text-stage-foreground/65 sm:text-base">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-stage-foreground/65 sm:text-base">
               منصة واحدة تدير الدعم الفني لعدة شركات في آنٍ معاً. لكل شركة مسار مستقل وهوية بصرية
               خاصة ولوحة تحكم كاملة: تتحكم بحقول نموذج التذكرة وترتيبها، وتنشئ عضويات مشرفين للوحة
               التحكم وعضويات موظفين يرفعون تذاكرهم ويتابعون سجلهم السابق من حساباتهم.
             </p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
                 href={wa ? whatsappLink(wa) : "#contact"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:-translate-y-0.5"
               >
                 <MessageCircle className="h-4 w-4" /> اطلب الخدمة عبر واتساب
               </a>
               <a
                 href={email ? `mailto:${email}` : "#contact"}
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-stage-foreground/20 px-6 py-4 text-sm font-black text-stage-foreground transition hover:border-primary hover:text-primary"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-stage-foreground/20 px-5 py-3.5 text-sm font-black text-stage-foreground transition hover:border-primary hover:text-primary"
               >
                 <Mail className="h-4 w-4" /> راسلنا بالبريد
               </a>
