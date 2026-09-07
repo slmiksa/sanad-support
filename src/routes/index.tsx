@@ -283,33 +283,6 @@ function LandingPage() {
           </div>
         </section>
 
-        <section id="faq" className="mx-auto max-w-5xl px-5 py-16 lg:py-24">
-          <div>
-            <p className="text-xs font-black text-primary">الأسئلة الشائعة</p>
-            <h2 className="mt-3 text-3xl font-black sm:text-5xl">لديك سؤال؟</h2>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              أكثر ما يسأل عنه عملاؤنا حول نظام سند وطريقة الاشتراك والاستخدام.
-            </p>
-          </div>
-
-          <Accordion type="single" collapsible className="mt-10 border-t border-border">
-            {FAQ.map((item, i) => (
-              <AccordionItem
-                key={item.q}
-                value={`faq-${i}`}
-                className="border-b border-border px-1"
-              >
-                <AccordionTrigger className="text-right text-sm font-black hover:no-underline">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </section>
-
         <section id="contact" className="bg-primary">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-2 lg:items-end lg:px-8 lg:py-24">
             <div><p className="text-xs font-black text-primary-foreground/60">ابدأ الآن</p>
