@@ -197,25 +197,25 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <header className="sticky top-0 z-40 border-b border-stage-foreground/10 bg-stage/95 text-stage-foreground backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
           <a href="/" className="flex items-center" aria-label="نظام سند للدعم الفني">
             <img
               src={sanadLogo}
               alt="شعار نظام سند للدعم الفني"
-              className="h-14 w-auto sm:h-16"
+              className="h-12 w-auto brightness-0 invert sm:h-14"
             />
           </a>
           <div className="flex items-center gap-2">
             <a
               href="#faq"
-              className="hidden rounded-xl px-3 py-2 text-sm font-bold text-muted-foreground transition hover:text-primary sm:inline-flex"
+              className="hidden px-3 py-2 text-sm font-bold text-stage-foreground/65 transition hover:text-primary sm:inline-flex"
             >
               الأسئلة الشائعة
             </a>
             <a
               href="#contact"
-              className="rounded-xl bg-primary px-4 py-2 text-xs font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:opacity-90 sm:text-sm"
+              className="rounded-md bg-primary px-4 py-2.5 text-xs font-black text-primary-foreground transition hover:-translate-y-0.5 sm:text-sm"
             >
               اطلب الخدمة
             </a>
@@ -224,127 +224,125 @@ function LandingPage() {
       </header>
 
       <main>
-        {/* Hero */}
-        <section
-          className="relative overflow-hidden"
-          style={{ background: "var(--hero-gradient)" }}
-        >
-          <div
-            className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl"
-            style={{ background: "color-mix(in oklab, var(--brand) 35%, transparent)" }}
-            aria-hidden
-          />
-          <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-24">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold text-brand-light backdrop-blur sm:text-xs">
+        <section className="relative overflow-hidden bg-stage text-stage-foreground">
+          <div className="pointer-events-none absolute -left-32 top-12 h-96 w-96 rotate-12 border-[5rem] border-primary/15 brand-drift" aria-hidden />
+          <div className="pointer-events-none absolute -bottom-52 right-1/3 h-96 w-96 -rotate-12 bg-primary/10 brand-drift" aria-hidden />
+          <div className="relative mx-auto grid min-h-[calc(100svh-5rem)] max-w-7xl items-center gap-10 px-5 pb-16 pt-12 lg:grid-cols-12 lg:px-8 lg:py-20">
+            <div className="reveal-up lg:col-span-8">
+            <span className="inline-flex items-center gap-2 border-r-2 border-primary pr-3 text-xs font-bold text-primary">
               <Sparkles className="h-3.5 w-3.5" /> منصة تذاكر دعم فني متعددة الشركات
             </span>
 
-            <h1 className="mt-5 max-w-3xl text-3xl font-black leading-[1.25] text-white sm:text-5xl">
-              <span className="text-brand-light">نظام سند</span> للدعم الفني لكل شركة
+            <h1 className="mt-7 max-w-4xl text-5xl font-black leading-[1.12] sm:text-7xl lg:text-[6.5rem]">
+              سند<span className="text-primary">.</span><br />بوابتك للحلول
             </h1>
 
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
+            <p className="mt-7 max-w-2xl text-sm leading-8 text-stage-foreground/65 sm:text-base">
               منصة واحدة تدير الدعم الفني لعدة شركات في آنٍ معاً. لكل شركة مسار مستقل وهوية بصرية
               خاصة ولوحة تحكم كاملة: تتحكم بحقول نموذج التذكرة وترتيبها، وتنشئ عضويات مشرفين للوحة
               التحكم وعضويات موظفين يرفعون تذاكرهم ويتابعون سجلهم السابق من حساباتهم.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
                 href={wa ? whatsappLink(wa) : "#contact"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:opacity-90"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:-translate-y-0.5"
               >
                 <MessageCircle className="h-4 w-4" /> اطلب الخدمة عبر واتساب
               </a>
               <a
                 href={email ? `mailto:${email}` : "#contact"}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-5 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-stage-foreground/20 px-6 py-4 text-sm font-black text-stage-foreground transition hover:border-primary hover:text-primary"
               >
                 <Mail className="h-4 w-4" /> راسلنا بالبريد
               </a>
             </div>
 
+            </div>
+            <div className="lg:col-span-4 lg:self-end">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 if (slug.trim()) void navigate({ to: "/c/$slug", params: { slug: slug.trim() } });
               }}
-              className="mt-8 flex w-full max-w-md flex-col gap-2 rounded-2xl border border-white/15 bg-white/5 p-2 backdrop-blur sm:flex-row"
+              className="flex w-full flex-col gap-2 rounded-lg border border-stage-foreground/15 bg-stage-foreground/5 p-3 backdrop-blur"
             >
+              <label htmlFor="company-slug" className="px-2 pt-1 text-xs font-black text-stage-foreground/65">ادخل إلى بوابة شركتك</label>
               <input
+                id="company-slug"
                 dir="ltr"
-                className="w-full rounded-xl border border-transparent bg-white/10 px-3 py-3 text-sm text-white placeholder:text-white/50 focus:border-brand-light focus:outline-none"
+                className="w-full rounded-md border border-stage-foreground/15 bg-stage-foreground/10 px-4 py-4 text-sm text-stage-foreground placeholder:text-stage-foreground/40 focus:border-primary focus:outline-none"
                 placeholder="ادخل مسار شركتك مثال: acme"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase())}
               />
-              <button className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-3 text-sm font-black text-white transition hover:bg-white/25">
+              <button className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-3.5 text-sm font-black text-primary-foreground transition hover:opacity-90">
                 دخول البوابة <ArrowLeft className="h-4 w-4" />
               </button>
             </form>
 
-            <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            </form>
+            <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-stage-foreground/10">
               {STATS.map((s) => (
                 <div
                   key={s.label}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur"
+                  className="bg-stage px-4 py-5"
                 >
-                  <dt className="text-xl font-black text-brand-light sm:text-2xl">{s.value}</dt>
-                  <dd className="mt-1 text-[11px] text-white/60 sm:text-xs">{s.label}</dd>
+                  <dt className="text-2xl font-black text-primary">{s.value}</dt>
+                  <dd className="mt-1 text-[11px] text-stage-foreground/50">{s.label}</dd>
                 </div>
               ))}
             </dl>
+            </div>
           </div>
         </section>
 
-        {/* Features */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-          <div className="max-w-2xl">
-            <p className="text-xs font-black text-primary">المميزات</p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">كل ما يحتاجه الدعم الفني</h2>
+        <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black text-primary">كل شيء في مكان واحد</p>
+            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-5xl">كل ما يحتاجه الدعم الفني،<br />دون تعقيد.</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               أدوات متكاملة لاستقبال التذاكر ومتابعتها وقياس أداء فريقك.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
+          <div className="mt-10 grid auto-rows-[minmax(13rem,auto)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map((f, index) => (
               <article
                 key={f.title}
-                className="group rounded-2xl border border-border bg-card p-5 transition duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[var(--shadow-brand)] sm:p-6"
+                className={`group flex flex-col justify-between rounded-lg border border-border p-6 transition duration-300 hover:-translate-y-1 hover:border-primary ${index === 0 ? "bg-primary text-primary-foreground sm:col-span-2" : index === 1 ? "bg-stage text-stage-foreground lg:row-span-2" : "bg-card"}`}
               >
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                <span className={`grid h-11 w-11 place-items-center rounded-md transition ${index === 0 ? "bg-primary-foreground/15 text-primary-foreground" : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground"}`}>
                   <f.icon className="h-5 w-5" />
                 </span>
-                <h3 className="mt-4 text-base font-black">{f.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+                <div><h3 className="mt-8 text-lg font-black">{f.title}</h3>
+                <p className={`mt-2 text-xs leading-6 ${index === 0 ? "text-primary-foreground/70" : index === 1 ? "text-stage-foreground/60" : "text-muted-foreground"}`}>{f.body}</p></div>
               </article>
             ))}
           </div>
         </section>
 
-        {/* Steps */}
-        <section className="border-y border-border bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+        <section className="border-y border-border bg-surface-tint">
+          <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
             <p className="text-xs font-black text-primary">الخطوات</p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">كيف يعمل النظام؟</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <h2 className="mt-3 text-3xl font-black sm:text-5xl">من الاشتراك إلى الحل.</h2>
+            <div className="mt-10 grid gap-px overflow-hidden rounded-lg bg-border sm:grid-cols-3">
               {STEPS.map((s, i) => (
                 <article
                   key={s.title}
-                  className="relative overflow-hidden rounded-2xl border border-border bg-card p-6"
+                  className="relative min-h-64 overflow-hidden bg-card p-7"
                 >
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 grid place-items-center text-[7rem] font-black leading-none text-primary/25 select-none"
+                    className="pointer-events-none absolute -bottom-8 -left-2 text-[10rem] font-black leading-none text-primary/12 select-none"
                   >
                     {i + 1}
                   </span>
 
-                  <h3 className="relative text-sm font-black text-primary">{s.title}</h3>
-                  <p className="relative mt-2 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+                   <h3 className="relative text-lg font-black text-primary">{s.title}</h3>
+                   <p className="relative mt-4 max-w-xs text-sm leading-7 text-muted-foreground">{s.body}</p>
 
                 </article>
               ))}
@@ -352,22 +350,21 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section id="faq" className="mx-auto max-w-4xl px-4 py-14 sm:py-20">
-          <div className="text-center">
+        <section id="faq" className="mx-auto max-w-5xl px-5 py-16 lg:py-24">
+          <div>
             <p className="text-xs font-black text-primary">الأسئلة الشائعة</p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">استفسارات وأجوبة</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+            <h2 className="mt-3 text-3xl font-black sm:text-5xl">لديك سؤال؟</h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
               أكثر ما يسأل عنه عملاؤنا حول نظام سند وطريقة الاشتراك والاستخدام.
             </p>
           </div>
 
-          <Accordion type="single" collapsible className="mt-8 space-y-3">
+          <Accordion type="single" collapsible className="mt-10 border-t border-border">
             {FAQ.map((item, i) => (
               <AccordionItem
                 key={item.q}
                 value={`faq-${i}`}
-                className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+                className="border-b border-border px-1"
               >
                 <AccordionTrigger className="text-right text-sm font-black hover:no-underline">
                   {item.q}
@@ -380,29 +377,26 @@ function LandingPage() {
           </Accordion>
         </section>
 
-        {/* Contact */}
-        <section id="contact" className="mx-auto max-w-6xl px-4 pb-20">
-          <div
-            className="relative overflow-hidden rounded-3xl border border-primary/20 p-8 text-center sm:p-12"
-            style={{ background: "var(--hero-gradient)" }}
-          >
-            <h2 className="text-2xl font-black text-white sm:text-3xl">اطلب الخدمة الآن</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/70">
+        <section id="contact" className="bg-primary">
+          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-2 lg:items-end lg:px-8 lg:py-24">
+            <div><p className="text-xs font-black text-primary-foreground/60">ابدأ الآن</p>
+            <h2 className="mt-3 text-4xl font-black text-primary-foreground sm:text-6xl">اطلب الخدمة الآن.</h2>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-primary-foreground/70">
               نجهّز لشركتك بوابة تذاكر خاصة بهويتها ومسارها خلال وقت قصير. تواصل معنا واختر الطريقة
               الأنسب لك.
-            </p>
-            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            </p></div>
+            <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
               <a
                 href={wa ? whatsappLink(wa) : "#contact"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:opacity-90"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-stage px-6 py-4 text-sm font-black text-stage-foreground transition hover:-translate-y-0.5"
               >
                 <MessageCircle className="h-4 w-4" /> تواصل عبر واتساب
               </a>
               <a
                 href={email ? `mailto:${email}` : "#contact"}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-primary-foreground/30 px-6 py-4 text-sm font-black text-primary-foreground transition hover:bg-primary-foreground hover:text-primary"
               >
                 <Mail className="h-4 w-4" /> راسلنا بالبريد
               </a>
