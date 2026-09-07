@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { usePlatformSettings, whatsappLink } from "@/lib/platform";
 import sanadLogo from "@/assets/sanad-logo.png";
-import transparentLogoAsset from "@/assets/sanad-logo-transparent.png.asset.json";
+import transparentSanadLogo from "@/assets/sanad-logo-transparent-local.png";
 import {
   Accordion,
   AccordionContent,
@@ -201,7 +201,7 @@ function LandingPage() {
       <header className="sticky top-0 z-40 border-b border-stage-foreground/10 bg-stage/95 text-stage-foreground backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
           <a href="/" className="flex items-center gap-2" aria-label="نظام سند للدعم الفني">
-            <img src={transparentLogoAsset.url} alt="شعار نظام سند" className="h-12 w-12 object-contain sm:h-14 sm:w-14" />
+            <img src={transparentSanadLogo} alt="شعار نظام سند" className="h-12 w-12 object-contain sm:h-14 sm:w-14" />
             <span className="hidden text-[10px] font-bold leading-5 text-stage-foreground/50 sm:inline">نظام سند<br />للدعم الفني</span>
           </a>
           <div className="flex items-center gap-2">
