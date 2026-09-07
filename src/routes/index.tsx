@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -19,12 +19,6 @@ import {
 import { usePlatformSettings, whatsappLink } from "@/lib/platform";
 import sanadLogo from "@/assets/sanad-logo.png";
 import transparentSanadLogo from "@/assets/sanad-logo-transparent-local.png";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const SITE_ORIGIN = "https://project--0ea35464-4366-4fbb-82c3-d3352d37ad72.lovable.app";
 const LOGO_URL = `${SITE_ORIGIN}${sanadLogo}`;
@@ -130,64 +124,6 @@ const STATS = [
   { value: "٣", label: "مستويات صلاحيات" },
 ];
 
-const FAQ = [
-  {
-    q: "ما هو نظام سند للدعم الفني؟",
-    a: "منصة سحابية لإدارة تذاكر الدعم الفني، تتيح لكل شركة بوابة مستقلة بمسار خاص وهوية بصرية خاصة، مع لوحة تحكم لإدارة التذاكر والعضويات والتقارير.",
-  },
-  {
-    q: "كيف أحصل على حساب لشركتي؟",
-    a: "تواصل معنا عبر واتساب أو البريد الإلكتروني من قسم «اطلب الخدمة»، ونقوم بتجهيز اشتراك شركتكم ومسارها الخاص وحساب الأدمن وتسليمكم بيانات الدخول.",
-  },
-  {
-    q: "هل يستطيع الموظف إنشاء حساب بنفسه؟",
-    a: "لا. إنشاء العضويات يتم من إدارة الشركة داخل لوحة التحكم فقط، والموظف يسجّل الدخول ببريده وكلمة المرور التي تزوّده بها إدارته.",
-  },
-  {
-    q: "ما الفرق بين المشرف والموظف؟",
-    a: "المشرف يدخل لوحة التحكم ويستعرض جميع التذاكر ويرد عليها ويغيّر حالتها، بينما الموظف يرفع التذاكر ويتابع سجل تذاكره الخاصة فقط.",
-  },
-  {
-    q: "هل يمكنني تخصيص حقول نموذج التذكرة؟",
-    a: "نعم. يمكن إضافة حقول مخصصة (نص، رقم، قائمة اختيارات)، تفعيلها أو إخفاؤها، تحديد الإلزامي منها، وإعادة ترتيبها بالأسهم من لوحة التحكم.",
-  },
-  {
-    q: "هل يدعم النظام شعار الشركة وهويتها؟",
-    a: "نعم. ترفع الشركة شعارها من جهازها مباشرة وتضبط اسمها ووصفها، فتظهر الهوية في بوابة التذاكر ولوحة التحكم وبوابة الموظفين.",
-  },
-  {
-    q: "هل يمكن رفع المرفقات مع التذكرة؟",
-    a: "نعم، يمكن إرفاق الصور والملفات مع كل تذكرة، وتُعرض عبر روابط موقّعة مؤقتة تحفظ خصوصية البيانات.",
-  },
-  {
-    q: "كيف أتابع حالة تذكرتي؟",
-    a: "من ودجت «متابعة تذكرة» في بوابة شركتك بإدخال رقم التذكرة، أو من حسابك الشخصي حيث تظهر شارة «تحديث جديد» عند أي رد أو تغيير حالة.",
-  },
-  {
-    q: "هل توجد تقارير وإحصائيات؟",
-    a: "نعم. تتوفر مؤشرات أداء (KPIs) لعدد التذاكر وحالاتها، مع إمكانية تحديد فترة زمنية وتصدير كل التذاكر إلى ملف Excel شامل للحقول والردود والتواريخ.",
-  },
-  {
-    q: "ماذا لو لم يكن لدى شركتنا فريق دعم فني؟",
-    a: "نوفّر خدمة «الدعم الفني عن بُعد»، حيث يتابع فريق لمحة الآمنة تذاكر شركتكم ويرد عليها مباشرة، وتظهر لديكم شارة تفعيل الخدمة في لوحة التحكم.",
-  },
-  {
-    q: "هل بيانات كل شركة معزولة عن الأخرى؟",
-    a: "نعم. سياسات الأمان على مستوى الصف (RLS) تضمن أن كل شركة ترى تذاكرها ومستخدميها فقط دون أي تداخل.",
-  },
-  {
-    q: "هل النظام متوافق مع الجوال؟",
-    a: "بالكامل. جميع الشاشات بما فيها لوحات التحكم مصممة لتعمل بسلاسة على الجوال والتابلت والحاسب، مع وضع ليلي مريح للعين.",
-  },
-  {
-    q: "هل يمكن تشغيل النظام على سيرفر الشركة؟",
-    a: "نعم، تتوفر نسخة استضافة ذاتية تُبنى كملفات ثابتة تُرفع إلى استضافتك الخاصة مع دعم المسارات عبر ملف htaccess.",
-  },
-  {
-    q: "هل يدعم النظام الفروع المتعددة؟",
-    a: "نعم، يمكن تعريف فروع الشركة وربط كل تذكرة بفرعها لتسهيل التوزيع والمتابعة والتقارير.",
-  },
-];
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -205,12 +141,12 @@ function LandingPage() {
             <span className="hidden text-[10px] font-bold leading-5 text-stage-foreground/50 sm:inline">نظام سند<br />للدعم الفني</span>
           </a>
           <div className="flex items-center gap-2">
-            <a
-              href="#faq"
+            <Link
+              to="/faq"
               className="hidden px-3 py-2 text-sm font-bold text-stage-foreground/65 transition hover:text-primary sm:inline-flex"
             >
               الأسئلة الشائعة
-            </a>
+            </Link>
             <a
               href="#contact"
               className="rounded-md bg-primary px-4 py-2.5 text-xs font-black text-primary-foreground transition hover:-translate-y-0.5 sm:text-sm"
@@ -345,33 +281,6 @@ function LandingPage() {
               ))}
             </div>
           </div>
-        </section>
-
-        <section id="faq" className="mx-auto max-w-5xl px-5 py-16 lg:py-24">
-          <div>
-            <p className="text-xs font-black text-primary">الأسئلة الشائعة</p>
-            <h2 className="mt-3 text-3xl font-black sm:text-5xl">لديك سؤال؟</h2>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              أكثر ما يسأل عنه عملاؤنا حول نظام سند وطريقة الاشتراك والاستخدام.
-            </p>
-          </div>
-
-          <Accordion type="single" collapsible className="mt-10 border-t border-border">
-            {FAQ.map((item, i) => (
-              <AccordionItem
-                key={item.q}
-                value={`faq-${i}`}
-                className="border-b border-border px-1"
-              >
-                <AccordionTrigger className="text-right text-sm font-black hover:no-underline">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
         </section>
 
         <section id="contact" className="bg-primary">
