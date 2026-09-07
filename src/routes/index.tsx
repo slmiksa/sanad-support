@@ -141,12 +141,12 @@ function LandingPage() {
             <span className="hidden text-[10px] font-bold leading-5 text-stage-foreground/50 sm:inline">نظام سند<br />للدعم الفني</span>
           </a>
           <div className="flex items-center gap-2">
-            <a
-              href="#faq"
+            <Link
+              to="/faq"
               className="hidden px-3 py-2 text-sm font-bold text-stage-foreground/65 transition hover:text-primary sm:inline-flex"
             >
               الأسئلة الشائعة
-            </a>
+            </Link>
             <a
               href="#contact"
               className="rounded-md bg-primary px-4 py-2.5 text-xs font-black text-primary-foreground transition hover:-translate-y-0.5 sm:text-sm"
