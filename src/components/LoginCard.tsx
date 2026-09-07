@@ -141,17 +141,25 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
   };
 
   return (
-    <div className="relative grid min-h-[100svh] place-items-center overflow-hidden bg-background px-4 py-8 sm:py-12">
-      <div className="pointer-events-none absolute -top-32 right-[-10%] h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-[-20%] left-[-10%] h-96 w-96 rounded-full bg-primary/15 blur-3xl" />
+    <div className="relative grid min-h-[100svh] overflow-hidden bg-stage px-4 py-8 sm:place-items-center sm:py-12">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rotate-12 bg-primary/25 brand-drift" />
+      <div className="pointer-events-none absolute -bottom-32 -right-16 h-80 w-80 -rotate-12 border-[4rem] border-primary/10" />
 
-      <div className="relative w-full max-w-[26rem] sm:max-w-md">
-        <div className="overflow-hidden rounded-3xl border border-border/70 bg-card/80 shadow-xl backdrop-blur">
-          <div className="bg-gradient-to-br from-primary to-primary/70 px-5 py-6 text-primary-foreground sm:px-7 sm:py-7">
+      <div className="relative mx-auto grid w-full max-w-5xl items-stretch gap-0 overflow-hidden rounded-lg border border-stage-foreground/10 bg-card shadow-2xl md:grid-cols-[1.05fr_.95fr]">
+        <aside className="relative hidden min-h-[38rem] flex-col justify-between overflow-hidden bg-primary p-10 text-primary-foreground md:flex">
+          <span className="text-xs font-black">نظام سند • بوابة آمنة</span>
+          <div>
+            <p className="text-5xl font-black leading-[1.2]">دعم أسرع.<br />عمل أوضح.</p>
+            <p className="mt-5 max-w-sm text-sm leading-7 text-primary-foreground/70">بوابة شركتك لإدارة الطلبات ومتابعتها بأمان، من أول بلاغ حتى إغلاق التذكرة.</p>
+          </div>
+          <ShieldCheck className="h-24 w-24 text-primary-foreground/20" />
+        </aside>
+        <div className="flex flex-col justify-center bg-card">
+          <div className="border-b border-border bg-surface-tint px-5 py-6 sm:px-8 sm:py-7">
             <Link
               to={backTo.to}
               params={backTo.params as never}
-              className="text-xs font-bold opacity-90 hover:opacity-100"
+              className="text-xs font-bold text-muted-foreground hover:text-primary"
             >
               ← {backTo.label}
             </Link>
@@ -159,7 +167,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
               <img
                 src={logoUrl || sanadLogo}
                 alt={title}
-                className="h-14 w-14 shrink-0 rounded-2xl bg-white object-contain p-1.5 shadow-sm sm:h-16 sm:w-16"
+                className="h-14 w-14 shrink-0 rounded-md bg-card object-contain p-1.5 shadow-sm sm:h-16 sm:w-16"
               />
               <div className="min-w-0">
                 <h1 className="truncate text-lg font-black leading-tight sm:text-xl">
@@ -170,7 +178,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
             </div>
           </div>
 
-          <div className="px-5 py-6 sm:px-7 sm:py-7">
+          <div className="px-5 py-7 sm:px-8 sm:py-9">
             {stage === "credentials" ? (
               <>
                 <p className="text-xs leading-6 text-muted-foreground">
@@ -211,7 +219,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
                   </label>
                   <button
                     disabled={busy}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground shadow-sm transition hover:opacity-95 disabled:opacity-60"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3.5 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:-translate-y-0.5 disabled:opacity-60"
                   >
                     {busy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -224,7 +232,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
               </>
             ) : (
               <>
-                <span className="inline-grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                 <span className="inline-grid h-12 w-12 place-items-center rounded-md bg-primary/10 text-primary">
                   <MailCheck className="h-6 w-6" />
                 </span>
                 <p className="mt-3 text-xs leading-6 text-muted-foreground">
@@ -252,7 +260,7 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
                   </label>
                   <button
                     disabled={busy || code.length < 6}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground shadow-sm transition hover:opacity-95 disabled:opacity-60"
+                     className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3.5 text-sm font-black text-primary-foreground shadow-[var(--shadow-brand)] transition hover:-translate-y-0.5 disabled:opacity-60"
                   >
                     {busy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
