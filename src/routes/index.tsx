@@ -283,7 +283,6 @@ function LandingPage() {
               </button>
             </form>
 
-            </form>
             <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-stage-foreground/10">
               {STATS.map((s) => (
                 <div
