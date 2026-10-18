@@ -38,6 +38,7 @@ import { useAccess } from "@/lib/use-access";
 
 import { AccessGate } from "@/components/AccessGate";
 import { CompanyReports } from "@/components/CompanyReports";
+import { MemberExcelImport } from "@/components/MemberExcelImport";
 
 export const Route = createFileRoute("/_authenticated/c/$slug/admin")({
   head: () => ({
@@ -949,6 +950,7 @@ function CompanyAdminPage() {
                 </div>
               );
             })()}
+            {companyId && <MemberExcelImport companyId={companyId} onComplete={() => { void qc.invalidateQueries({ queryKey: ["members", companyId] }); }} />}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
