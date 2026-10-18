@@ -53,6 +53,8 @@ export type CreateCompanyInput = {
   branches?: string[];
   /** مدة الاشتراك بالأشهر (1 - 12) */
   subscription_months?: number;
+  /** الحد الأقصى لعدد العضويات (مستخدمين) للشركة */
+  max_members?: number;
   admin_name: string;
   admin_email: string;
   admin_password: string;
@@ -76,6 +78,7 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
       primary_color: data.primary_color ?? "#2563eb",
       secondary_color: data.secondary_color ?? "#0f766e",
       subscription_months: months,
+      max_members: Math.max(1, Math.round(data.max_members ?? 50)),
       subscription_starts_at: startsAt.toISOString(),
       subscription_ends_at: addMonths(startsAt, months).toISOString(),
     })
@@ -288,6 +291,21 @@ export async function updateSubscription({
       subscription_ends_at: addMonths(startsAt, months).toISOString(),
       subscription_notified_at: null,
     })
+    .eq("id", data.company_id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** تعديل الحد الأقصى لعدد عضويات شركة (أدمن المنصة فقط عبر RLS) */
+export async function updateMemberLimit({
+  data,
+}: {
+  data: { company_id: string; max_members: number };
+}) {
+  const limit = Math.max(1, Math.round(data.max_members));
+  const { error } = await supabase
+    .from("companies")
+    .update({ max_members: limit })
     .eq("id", data.company_id);
   if (error) throw new Error(error.message);
   return { ok: true };

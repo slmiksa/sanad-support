@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -25,6 +25,7 @@ import {
   createPlatformAgent,
   removePlatformAgent,
   updateSubscription,
+  updateMemberLimit,
   runExpiryCheck,
 } from "@/lib/admin.functions";
 import { MONTH_OPTIONS, formatDate, subscriptionState } from "@/lib/subscription";
@@ -69,6 +70,7 @@ const empty = {
   secondary_color: "#0f766e",
   branches: "",
   subscription_months: 12,
+  max_members: 50,
   admin_name: "",
   admin_email: "",
   admin_password: "",
@@ -113,7 +115,7 @@ function SuperAdminPage() {
       const { data, error } = await supabase
         .from("companies")
         .select(
-          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months",
+          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months, max_members",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -175,6 +177,16 @@ function SuperAdminPage() {
       updateSubscription({ data: { company_id: id, months } }),
     onSuccess: () => {
       toast.success("تم تحديث مدة الاشتراك");
+      void qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const limitMutation = useMutation({
+    mutationFn: async ({ id, max }: { id: string; max: number }) =>
+      updateMemberLimit({ data: { company_id: id, max_members: max } }),
+    onSuccess: () => {
+      toast.success("تم تحديث الحد الأقصى للعضويات");
       void qc.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -360,6 +372,18 @@ function SuperAdminPage() {
                   </option>
                 ))}
               </select>
+            </F>
+            <F label="الحد الأقصى لعدد العضويات">
+              <input
+                required
+                type="number"
+                min={1}
+                className="field"
+                value={form.max_members}
+                onChange={(e) =>
+                  setForm({ ...form, max_members: Math.max(1, Number(e.target.value) || 1) })
+                }
+              />
             </F>
             <F label="اللون الأساسي">
               <input
@@ -547,6 +571,7 @@ function SuperAdminPage() {
                 <th className="p-3">الحالة</th>
                 <th className="p-3">الاشتراك</th>
                 <th className="p-3">نوع الدعم</th>
+                <th className="p-3">حد العضويات</th>
                 <th className="p-3">روابط</th>
               </tr>
             </thead>
@@ -630,6 +655,13 @@ function SuperAdminPage() {
                     </button>
                   </td>
                   <td className="p-3">
+                    <MemberLimitCell
+                      value={c.max_members ?? 50}
+                      pending={limitMutation.isPending}
+                      onSave={(max) => limitMutation.mutate({ id: c.id, max })}
+                    />
+                  </td>
+                  <td className="p-3">
                     <div className="flex gap-3 text-xs font-bold text-primary">
                       <Link to="/c/$slug" params={{ slug: c.slug }}>
                         بوابة التذاكر <ExternalLink className="inline h-3 w-3" />
@@ -649,7 +681,7 @@ function SuperAdminPage() {
               ))}
               {companies.data?.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
                     لا توجد شركات بعد — أنشئ أول اشتراك.
                   </td>
                 </tr>
@@ -658,6 +690,38 @@ function SuperAdminPage() {
           </table>
         </div>
       </main>
+    </div>
+  );
+}
+
+function MemberLimitCell({
+  value,
+  pending,
+  onSave,
+}: {
+  value: number;
+  pending: boolean;
+  onSave: (max: number) => void;
+}) {
+  const [val, setVal] = useState(value);
+  useEffect(() => setVal(value), [value]);
+  const dirty = val !== value;
+  return (
+    <div className="flex items-center gap-1">
+      <input
+        type="number"
+        min={1}
+        className="w-20 rounded-lg border border-border bg-background px-2 py-1 text-xs"
+        value={val}
+        onChange={(e) => setVal(Math.max(1, Number(e.target.value) || 1))}
+      />
+      <button
+        onClick={() => onSave(val)}
+        disabled={pending || !dirty}
+        className="rounded-lg bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground disabled:opacity-40"
+      >
+        حفظ
+      </button>
     </div>
   );
 }
