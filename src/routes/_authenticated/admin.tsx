@@ -571,6 +571,7 @@ function SuperAdminPage() {
                 <th className="p-3">الحالة</th>
                 <th className="p-3">الاشتراك</th>
                 <th className="p-3">نوع الدعم</th>
+                <th className="p-3">حد العضويات</th>
                 <th className="p-3">روابط</th>
               </tr>
             </thead>
@@ -652,6 +653,13 @@ function SuperAdminPage() {
                       <Headset className="h-3 w-3" />
                       {c.managed_support ? "دعم من فريقنا" : "دعم داخلي للشركة"}
                     </button>
+                  </td>
+                  <td className="p-3">
+                    <MemberLimitCell
+                      value={c.max_members ?? 50}
+                      pending={limitMutation.isPending}
+                      onSave={(max) => limitMutation.mutate({ id: c.id, max })}
+                    />
                   </td>
                   <td className="p-3">
                     <div className="flex gap-3 text-xs font-bold text-primary">
