@@ -55,7 +55,7 @@ export function CompanyReports({
             type="date"
             className="field w-auto"
             value={from}
-            onChange={(e) => setFrom(e.target.value)}
+            onChange={(e) => { setFrom(e.target.value); setPage(1); }}
           />
         </label>
         <label className="space-y-1.5">
