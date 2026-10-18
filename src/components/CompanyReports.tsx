@@ -113,7 +113,7 @@ export function CompanyReports({
             </tr>
           </thead>
           <tbody>
-            {(report.data?.tickets ?? []).map((t) => (
+            {pageTickets.map((t) => (
               <tr key={t.id} className="border-t border-border">
                 <td className="p-3 text-xs font-bold" dir="ltr">
                   {t.ticket_no}
