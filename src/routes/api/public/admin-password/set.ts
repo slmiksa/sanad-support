@@ -40,6 +40,8 @@ export const Route = createFileRoute("/api/public/admin-password/set")({
           const { data: caller, error: callerError } = await admin.auth.getUser(token);
           if (callerError || !caller.user) return json({ error: "الجلسة غير صالحة" }, 401);
           const callerId = caller.user.id;
+          const { data: activeProfile } = await admin.from("profiles").select("is_active").eq("id", callerId).single();
+          if (activeProfile?.is_active !== true) return json({ error: "العضوية معطّلة" }, 403);
 
           // صلاحيات المتصل
           const { data: callerRoles } = await admin
