@@ -18,11 +18,13 @@ import {
   Headset,
   KeyRound,
   CalendarClock,
+  Power,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, subscriptionState } from "@/lib/subscription";
-import { createCompanyMember, deleteMember, setMemberPassword } from "@/lib/admin.functions";
+import { createCompanyMember, deleteMember, setMemberPassword, setMemberStatus } from "@/lib/admin.functions";
+import { Button } from "@/components/ui/button";
 import { PRIORITY_META, STATUS_META, type Priority, type Status } from "@/lib/tickets";
 import {
   COMPANY_SELECT,
@@ -227,12 +229,13 @@ function CompanyAdminPage() {
     queryKey: ["members", companyId],
     enabled: !!companyId,
     queryFn: async () => {
+      if (!companyId) return [];
       const [{ data: profiles }, { data: roles }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, full_name, email, employee_no, extension, specialty, department")
-          .eq("company_id", companyId!),
-        supabase.from("user_roles").select("user_id, role").eq("company_id", companyId!),
+          .select("id, full_name, email, employee_no, extension, specialty, department, is_active")
+          .eq("company_id", companyId),
+        supabase.from("user_roles").select("user_id, role").eq("company_id", companyId),
       ]);
       return (profiles ?? []).map((p) => ({
         ...p,
@@ -1074,6 +1077,7 @@ function CompanyAdminPage() {
 }
 
 type MemberRow = {
+  is_active: boolean;
   id: string;
   full_name: string;
   email: string;
@@ -1097,7 +1101,18 @@ function MembersSection({
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [statusId, setStatusId] = useState<string | null>(null);
   const qc = useQueryClient();
+  const toggleStatus = async (m: MemberRow) => {
+    setStatusId(m.id);
+    try {
+      await setMemberStatus({ data: { user_id: m.id, is_active: !m.is_active } });
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      toast.success(m.is_active ? "تم تعطيل العضوية ومنع الدخول" : "تم تفعيل العضوية");
+    } catch (error) {
+      toast.error("تعذّر تحديث العضوية", { description: (error as Error).message });
+    } finally { setStatusId(null); }
+  };
 
   const removeMember = async (m: MemberRow) => {
     if (!window.confirm(`سيتم حذف عضوية «${m.full_name || m.email}» نهائياً. هل أنت متأكد؟`)) return;
@@ -1153,6 +1168,7 @@ function MembersSection({
               <th className="p-3">التخصص</th>
               <th className="p-3">القسم</th>
               <th className="p-3">كلمة المرور</th>
+              <th className="p-3">حالة العضوية</th>
               <th className="p-3">حذف</th>
             </tr>
           </thead>
@@ -1221,11 +1237,19 @@ function MembersSection({
                     <Trash2 className="h-3 w-3" /> {deletingId === m.id ? "جارٍ..." : "حذف"}
                   </button>
                 </td>
+                <td className="p-3">
+                  <div className="flex flex-col items-start gap-2">
+                    <span className={m.is_active ? "text-xs font-bold text-primary" : "text-xs font-bold text-destructive"}>{m.is_active ? "مفعّلة" : "معطّلة"}</span>
+                    <Button variant="outline" size="sm" disabled={statusId !== null} onClick={() => void toggleStatus(m)}>
+                      <Power />{statusId === m.id ? "جارٍ..." : m.is_active ? "تعطيل" : "تفعيل"}
+                    </Button>
+                  </div>
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className="p-6 text-center text-xs text-muted-foreground">
+                <td colSpan={9} className="p-6 text-center text-xs text-muted-foreground">
                   لا توجد عضويات في هذا القسم بعد.
                 </td>
               </tr>

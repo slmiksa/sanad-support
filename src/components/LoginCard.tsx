@@ -44,8 +44,9 @@ async function checkScope(slug?: string): Promise<string | null> {
 
   const [{ data: roles }, { data: profile }] = await Promise.all([
     supabase.from("user_roles").select("role, company_id").eq("user_id", user.id),
-    supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("company_id, is_active").eq("id", user.id).maybeSingle(),
   ]);
+  if (profile?.is_active === false) return "تم تعطيل عضويتك، تواصل مع إدارة شركتك";
   const list = roles ?? [];
   const isPlatform = list.some((r) => r.role === "super_admin" || r.role === "platform_agent");
 

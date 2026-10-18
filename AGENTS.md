@@ -11,3 +11,5 @@
 
 - Excel membership import uses shared Zod validation and server-side Auth provisioning with rollback, preserving the administrator session and enforcing membership limits through the existing provisioning RPC.
 - Static installations send Excel provisioning to the platform API; local installations use a server function backed by the same authorized helper, keeping service credentials out of the browser.
+- Membership status uses protected profile activation state plus Supabase Auth bans; restrictive database policies block disabled sessions immediately, and account-management checks run as the authenticated caller before privileged updates.
+- All notifications use the shared Sonner wrapper and centralized presentation styles to keep timing and placement consistent.

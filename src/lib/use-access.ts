@@ -50,8 +50,12 @@ export function useAccess(): Access {
       }
       const [{ data: roles }, { data: profile }] = await Promise.all([
         supabase.from("user_roles").select("role, company_id").eq("user_id", user.id),
-        supabase.from("profiles").select("company_id, full_name").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("company_id, full_name, is_active").eq("id", user.id).maybeSingle(),
       ]);
+      if (profile?.is_active === false) {
+        await supabase.auth.signOut();
+        return;
+      }
       const isSuperAdmin = (roles ?? []).some((r) => r.role === "super_admin");
       const isPlatformAgent = (roles ?? []).some((r) => r.role === "platform_agent");
       const companyId = profile?.company_id ?? null;
@@ -84,11 +88,13 @@ export function useAccess(): Access {
     };
 
     void load();
+    const interval = window.setInterval(() => void load(), 15_000);
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") void load();
     });
     return () => {
       active = false;
+      window.clearInterval(interval);
       sub.subscription.unsubscribe();
     };
   }, []);

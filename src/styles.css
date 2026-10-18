@@ -246,3 +246,19 @@
   }
 }
 
+.toaster[data-sonner-toaster] {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(400px, calc(100vw - 32px)) !important;
+}
+.toaster [data-sonner-toast] {
+  padding: 24px !important;
+  border-radius: 8px !important;
+  gap: 14px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+}
+.toaster [data-icon] { color: var(--primary); }
+.toaster [data-type="error"] [data-icon] { color: var(--destructive); }
+

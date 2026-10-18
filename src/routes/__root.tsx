@@ -13,7 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BrandingProvider } from "@/lib/branding";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { SiteFooter } from "@/components/SiteFooter";
 
 
@@ -137,7 +137,7 @@ function RootComponent() {
           </div>
           <SiteFooter />
         </div>
-        <Toaster position="top-center" richColors dir="rtl" />
+        <Toaster />
       </BrandingProvider>
     </QueryClientProvider>
   );
