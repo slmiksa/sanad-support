@@ -44,8 +44,9 @@ async function checkScope(slug?: string): Promise<string | null> {
 
   const [{ data: roles }, { data: profile }] = await Promise.all([
     supabase.from("user_roles").select("role, company_id").eq("user_id", user.id),
-    supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("company_id, is_active").eq("id", user.id).maybeSingle(),
   ]);
+  if (profile?.is_active === false) return "تم تعطيل عضويتك، تواصل مع إدارة شركتك";
   const list = roles ?? [];
   const isPlatform = list.some((r) => r.role === "super_admin" || r.role === "platform_agent");
 
@@ -121,6 +122,11 @@ export function LoginCard({ slug, title, subtitle, logoUrl, backTo, hint }: Logi
       await callOtpApi("verify", { email, code: code.trim() });
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      const scopeError = await checkScope(slug);
+      if (scopeError) {
+        await supabase.auth.signOut();
+        throw new Error(scopeError);
+      }
       goPortal();
     } catch (err) {
       toast.error("تعذّر التحقق", { description: (err as Error).message });

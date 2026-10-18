@@ -25,6 +25,7 @@ import { Route as AuthenticatedCSlugAdminRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCSlugMeRouteImport } from './routes/_authenticated/c/$slug/me'
 import { Route as ApiPublicAdminMemberDeleteRouteImport } from './routes/api/public/admin-member/delete'
 import { Route as ApiPublicAdminMemberImportRouteImport } from './routes/api/public/admin-member/import'
+import { Route as ApiPublicAdminMemberStatusRouteImport } from './routes/api/public/admin-member/status'
 import { Route as ApiPublicAdminPasswordSetRouteImport } from './routes/api/public/admin-password/set'
 import { Route as ApiPublicAuthOtpSendRouteImport } from './routes/api/public/auth-otp/send'
 import { Route as ApiPublicAuthOtpVerifyRouteImport } from './routes/api/public/auth-otp/verify'
@@ -114,6 +115,12 @@ const ApiPublicAdminMemberImportRoute =
     path: '/api/public/admin-member/import',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminMemberStatusRoute =
+  ApiPublicAdminMemberStatusRouteImport.update({
+    id: '/api/public/admin-member/status',
+    path: '/api/public/admin-member/status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminPasswordSetRoute =
   ApiPublicAdminPasswordSetRouteImport.update({
     id: '/api/public/admin-password/set',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-member/import': typeof ApiPublicAdminMemberImportRoute
+  '/api/public/admin-member/status': typeof ApiPublicAdminMemberStatusRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-member/import': typeof ApiPublicAdminMemberImportRoute
+  '/api/public/admin-member/status': typeof ApiPublicAdminMemberStatusRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/c/$slug/me': typeof AuthenticatedCSlugMeRoute
   '/api/public/admin-member/delete': typeof ApiPublicAdminMemberDeleteRoute
   '/api/public/admin-member/import': typeof ApiPublicAdminMemberImportRoute
+  '/api/public/admin-member/status': typeof ApiPublicAdminMemberStatusRoute
   '/api/public/admin-password/set': typeof ApiPublicAdminPasswordSetRoute
   '/api/public/auth-otp/send': typeof ApiPublicAuthOtpSendRoute
   '/api/public/auth-otp/verify': typeof ApiPublicAuthOtpVerifyRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/admin-member/delete'
     | '/api/public/admin-member/import'
+    | '/api/public/admin-member/status'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/c/$slug/me'
     | '/api/public/admin-member/delete'
     | '/api/public/admin-member/import'
+    | '/api/public/admin-member/status'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/c/$slug/me'
     | '/api/public/admin-member/delete'
     | '/api/public/admin-member/import'
+    | '/api/public/admin-member/status'
     | '/api/public/admin-password/set'
     | '/api/public/auth-otp/send'
     | '/api/public/auth-otp/verify'
@@ -304,6 +317,7 @@ export interface RootRouteChildren {
   CSlugIndexRoute: typeof CSlugIndexRoute
   ApiPublicAdminMemberDeleteRoute: typeof ApiPublicAdminMemberDeleteRoute
   ApiPublicAdminMemberImportRoute: typeof ApiPublicAdminMemberImportRoute
+  ApiPublicAdminMemberStatusRoute: typeof ApiPublicAdminMemberStatusRoute
   ApiPublicAdminPasswordSetRoute: typeof ApiPublicAdminPasswordSetRoute
   ApiPublicAuthOtpSendRoute: typeof ApiPublicAuthOtpSendRoute
   ApiPublicAuthOtpVerifyRoute: typeof ApiPublicAuthOtpVerifyRoute
@@ -425,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminMemberImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin-member/status': {
+      id: '/api/public/admin-member/status'
+      path: '/api/public/admin-member/status'
+      fullPath: '/api/public/admin-member/status'
+      preLoaderRoute: typeof ApiPublicAdminMemberStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin-password/set': {
       id: '/api/public/admin-password/set'
       path: '/api/public/admin-password/set'
@@ -504,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   CSlugIndexRoute: CSlugIndexRoute,
   ApiPublicAdminMemberDeleteRoute: ApiPublicAdminMemberDeleteRoute,
   ApiPublicAdminMemberImportRoute: ApiPublicAdminMemberImportRoute,
+  ApiPublicAdminMemberStatusRoute: ApiPublicAdminMemberStatusRoute,
   ApiPublicAdminPasswordSetRoute: ApiPublicAdminPasswordSetRoute,
   ApiPublicAuthOtpSendRoute: ApiPublicAuthOtpSendRoute,
   ApiPublicAuthOtpVerifyRoute: ApiPublicAuthOtpVerifyRoute,

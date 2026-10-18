@@ -10,6 +10,17 @@ import { addMonths } from "@/lib/subscription";
  */
 
 type AnyRecord = Record<string, unknown>;
+export async function setMemberStatus({ data }: { data: { user_id: string; is_active: boolean } }) {
+  const { data: session } = await supabase.auth.getSession();
+  const token = session.session?.access_token;
+  if (!token) throw new Error("انتهت الجلسة، سجّل الدخول مجدداً");
+  const res = await fetch(apiUrl("/api/public/admin-member/status"), {
+    method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(data),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error ?? "تعذّر تحديث العضوية");
+  return body;
+}
 
 // عميل ثانوي لإنشاء الحسابات دون التأثير على جلسة الأدمن الحالية
 function signupClient() {

@@ -233,6 +233,7 @@ export type Database = {
           extension: string | null
           full_name: string
           id: string
+          is_active: boolean
           phone: string | null
           specialty: string | null
           updated_at: string
@@ -246,6 +247,7 @@ export type Database = {
           extension?: string | null
           full_name?: string
           id: string
+          is_active?: boolean
           phone?: string | null
           specialty?: string | null
           updated_at?: string
@@ -259,6 +261,7 @@ export type Database = {
           extension?: string | null
           full_name?: string
           id?: string
+          is_active?: boolean
           phone?: string | null
           specialty?: string | null
           updated_at?: string
@@ -461,6 +464,7 @@ export type Database = {
         Args: { _company_id: string; _user_id: string }
         Returns: boolean
       }
+      is_membership_active: { Args: { _user_id: string }; Returns: boolean }
       is_platform_agent: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       requires_two_factor: { Args: { _user_id: string }; Returns: boolean }
