@@ -22,6 +22,7 @@ export function CompanyReports({
     return iso(d);
   });
   const [to, setTo] = useState(() => iso(new Date()));
+  const [page, setPage] = useState(1);
 
   const report = useQuery({
     queryKey: ["report", companyId, from, to],
