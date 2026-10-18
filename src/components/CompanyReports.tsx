@@ -22,6 +22,7 @@ export function CompanyReports({
     return iso(d);
   });
   const [to, setTo] = useState(() => iso(new Date()));
+  const [page, setPage] = useState(1);
 
   const report = useQuery({
     queryKey: ["report", companyId, from, to],
@@ -29,6 +30,12 @@ export function CompanyReports({
   });
 
   const kpis = report.data ? computeKpis(report.data) : null;
+
+  const PAGE_SIZE = 50;
+  const allTickets = report.data?.tickets ?? [];
+  const pageCount = Math.max(1, Math.ceil(allTickets.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pageTickets = allTickets.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const download = () => {
     if (!report.data) return;
@@ -48,7 +55,7 @@ export function CompanyReports({
             type="date"
             className="field w-auto"
             value={from}
-            onChange={(e) => setFrom(e.target.value)}
+            onChange={(e) => { setFrom(e.target.value); setPage(1); }}
           />
         </label>
         <label className="space-y-1.5">
@@ -57,7 +64,7 @@ export function CompanyReports({
             type="date"
             className="field w-auto"
             value={to}
-            onChange={(e) => setTo(e.target.value)}
+            onChange={(e) => { setTo(e.target.value); setPage(1); }}
           />
         </label>
         <button
@@ -106,7 +113,7 @@ export function CompanyReports({
             </tr>
           </thead>
           <tbody>
-            {(report.data?.tickets ?? []).map((t) => (
+            {pageTickets.map((t) => (
               <tr key={t.id} className="border-t border-border">
                 <td className="p-3 text-xs font-bold" dir="ltr">
                   {t.ticket_no}
@@ -131,6 +138,29 @@ export function CompanyReports({
             )}
           </tbody>
         </table>
+        {allTickets.length > PAGE_SIZE && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-3 text-xs">
+            <span className="text-muted-foreground">
+              عرض {pageTickets.length} من {allTickets.length} تذكرة — صفحة {safePage} من {pageCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="rounded-lg border border-border px-3 py-1.5 font-bold disabled:opacity-40"
+              >
+                السابق
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={safePage >= pageCount}
+                className="rounded-lg border border-border px-3 py-1.5 font-bold disabled:opacity-40"
+              >
+                التالي
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
