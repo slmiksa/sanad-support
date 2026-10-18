@@ -31,6 +31,12 @@ export function CompanyReports({
 
   const kpis = report.data ? computeKpis(report.data) : null;
 
+  const PAGE_SIZE = 50;
+  const allTickets = report.data?.tickets ?? [];
+  const pageCount = Math.max(1, Math.ceil(allTickets.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pageTickets = allTickets.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
   const download = () => {
     if (!report.data) return;
     try {
