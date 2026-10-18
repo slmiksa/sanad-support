@@ -64,7 +64,7 @@ export function CompanyReports({
             type="date"
             className="field w-auto"
             value={to}
-            onChange={(e) => setTo(e.target.value)}
+            onChange={(e) => { setTo(e.target.value); setPage(1); }}
           />
         </label>
         <button
