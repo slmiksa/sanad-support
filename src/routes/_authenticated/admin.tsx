@@ -694,6 +694,38 @@ function SuperAdminPage() {
   );
 }
 
+function MemberLimitCell({
+  value,
+  pending,
+  onSave,
+}: {
+  value: number;
+  pending: boolean;
+  onSave: (max: number) => void;
+}) {
+  const [val, setVal] = useState(value);
+  useEffect(() => setVal(value), [value]);
+  const dirty = val !== value;
+  return (
+    <div className="flex items-center gap-1">
+      <input
+        type="number"
+        min={1}
+        className="w-20 rounded-lg border border-border bg-background px-2 py-1 text-xs"
+        value={val}
+        onChange={(e) => setVal(Math.max(1, Number(e.target.value) || 1))}
+      />
+      <button
+        onClick={() => onSave(val)}
+        disabled={pending || !dirty}
+        className="rounded-lg bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground disabled:opacity-40"
+      >
+        حفظ
+      </button>
+    </div>
+  );
+}
+
 function Row({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
