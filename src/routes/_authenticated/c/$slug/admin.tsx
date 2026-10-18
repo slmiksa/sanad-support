@@ -926,6 +926,29 @@ function CompanyAdminPage() {
 
         {tab === "users" && (
           <div className="space-y-6">
+            {(() => {
+              const limit = Number(company.data?.max_members ?? 50);
+              const count = (members.data ?? []).length;
+              const full = count >= limit;
+              return (
+                <div
+                  className={`flex flex-wrap items-center justify-between gap-2 rounded-2xl border p-4 text-xs font-bold ${
+                    full
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : "border-border bg-card text-muted-foreground"
+                  }`}
+                >
+                  <span>
+                    العضويات المستخدمة: {count} من {limit}
+                  </span>
+                  {full && (
+                    <span>
+                      وصلت شركتك للحد الأقصى من العضويات — تواصل مع أدمن المنصة لزيادة الحد.
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
