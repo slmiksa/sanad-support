@@ -4,6 +4,14 @@ import { Loader2 } from "lucide-react";
 import { useAccess } from "@/lib/use-access";
 
 export const Route = createFileRoute("/_authenticated/portal")({
+  head: () => ({ meta: [
+    { title: "بوابة الحساب | نظام سند" },
+    { name: "description", content: "الوصول إلى حسابك وخدمات شركتك في نظام سند للدعم الفني." },
+    { property: "og:title", content: "بوابة الحساب | نظام سند" },
+    { property: "og:description", content: "بوابة حسابات الشركات وفريق الدعم في نظام سند." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: PortalPage,
 });
 
