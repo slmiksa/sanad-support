@@ -25,6 +25,7 @@ import {
   createPlatformAgent,
   removePlatformAgent,
   updateSubscription,
+  updateMemberLimit,
   runExpiryCheck,
 } from "@/lib/admin.functions";
 import { MONTH_OPTIONS, formatDate, subscriptionState } from "@/lib/subscription";
@@ -69,6 +70,7 @@ const empty = {
   secondary_color: "#0f766e",
   branches: "",
   subscription_months: 12,
+  max_members: 50,
   admin_name: "",
   admin_email: "",
   admin_password: "",
@@ -113,7 +115,7 @@ function SuperAdminPage() {
       const { data, error } = await supabase
         .from("companies")
         .select(
-          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months",
+          "id, name, slug, plan, is_active, created_at, managed_support, subscription_starts_at, subscription_ends_at, subscription_months, max_members",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
