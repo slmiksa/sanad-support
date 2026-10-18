@@ -138,6 +138,29 @@ export function CompanyReports({
             )}
           </tbody>
         </table>
+        {allTickets.length > PAGE_SIZE && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-3 text-xs">
+            <span className="text-muted-foreground">
+              عرض {pageTickets.length} من {allTickets.length} تذكرة — صفحة {safePage} من {pageCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="rounded-lg border border-border px-3 py-1.5 font-bold disabled:opacity-40"
+              >
+                السابق
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={safePage >= pageCount}
+                className="rounded-lg border border-border px-3 py-1.5 font-bold disabled:opacity-40"
+              >
+                التالي
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
