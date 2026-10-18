@@ -182,6 +182,16 @@ function SuperAdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const limitMutation = useMutation({
+    mutationFn: async ({ id, max }: { id: string; max: number }) =>
+      updateMemberLimit({ data: { company_id: id, max_members: max } }),
+    onSuccess: () => {
+      toast.success("تم تحديث الحد الأقصى للعضويات");
+      void qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const expiryCheck = useMutation({
     mutationFn: runExpiryCheck,
     onSuccess: (res) =>
@@ -362,6 +372,18 @@ function SuperAdminPage() {
                   </option>
                 ))}
               </select>
+            </F>
+            <F label="الحد الأقصى لعدد العضويات">
+              <input
+                required
+                type="number"
+                min={1}
+                className="field"
+                value={form.max_members}
+                onChange={(e) =>
+                  setForm({ ...form, max_members: Math.max(1, Number(e.target.value) || 1) })
+                }
+              />
             </F>
             <F label="اللون الأساسي">
               <input
