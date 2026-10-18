@@ -53,6 +53,8 @@ export type CreateCompanyInput = {
   branches?: string[];
   /** مدة الاشتراك بالأشهر (1 - 12) */
   subscription_months?: number;
+  /** الحد الأقصى لعدد العضويات (مستخدمين) للشركة */
+  max_members?: number;
   admin_name: string;
   admin_email: string;
   admin_password: string;
@@ -76,6 +78,7 @@ export async function createCompany({ data }: { data: CreateCompanyInput }) {
       primary_color: data.primary_color ?? "#2563eb",
       secondary_color: data.secondary_color ?? "#0f766e",
       subscription_months: months,
+      max_members: Math.max(1, Math.round(data.max_members ?? 50)),
       subscription_starts_at: startsAt.toISOString(),
       subscription_ends_at: addMonths(startsAt, months).toISOString(),
     })
