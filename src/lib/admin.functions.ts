@@ -296,6 +296,21 @@ export async function updateSubscription({
   return { ok: true };
 }
 
+/** تعديل الحد الأقصى لعدد عضويات شركة (أدمن المنصة فقط عبر RLS) */
+export async function updateMemberLimit({
+  data,
+}: {
+  data: { company_id: string; max_members: number };
+}) {
+  const limit = Math.max(1, Math.round(data.max_members));
+  const { error } = await supabase
+    .from("companies")
+    .update({ max_members: limit })
+    .eq("id", data.company_id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
 /** تشغيل فحص الاشتراكات القاربة على الانتهاء وإرسال التنبيهات عبر Resend */
 export async function runExpiryCheck() {
   const res = await fetch(apiUrl("/api/public/subscription-expiry/notify"), {
