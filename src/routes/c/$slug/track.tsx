@@ -17,6 +17,8 @@ export const Route = createFileRoute("/c/$slug/track")({
       },
       { property: "og:title", content: "متابعة تذكرة الدعم الفني" },
       { property: "og:description", content: "تتبّع حالة تذكرتك وسجل التحديثات لحظة بلحظة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   errorComponent: () => (

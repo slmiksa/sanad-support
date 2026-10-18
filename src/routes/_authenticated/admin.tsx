@@ -43,6 +43,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       },
       { property: "og:title", content: "لوحة أدمن المنصة" },
       { property: "og:description", content: "إدارة اشتراكات الشركات وحسابات الأدمن." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SuperAdminGuard,
