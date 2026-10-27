@@ -100,7 +100,7 @@ export function MemberExcelImport({ companyId, onComplete }: { companyId: string
     <div className="flex flex-wrap items-end gap-3">
       <label className="min-w-0 space-y-2"><span className="block text-xs font-bold">نوع العضويات</span>
         <select className="field" aria-label="نوع العضويات المستوردة" value={role} disabled={busy} onChange={(e) => setRole(e.target.value as MemberRole)}>
-          <option value="employee">موظف (يرفع تذاكر)</option><option value="agent">فني دعم</option><option value="company_admin">مشرف لوحة التحكم</option>
+          <option value="employee">موظف (يرفع تذاكر)</option><option value="agent">الدعم الفني</option><option value="company_admin">مشرف لوحة التحكم</option>
         </select>
       </label>
       {sheet && <><span className="py-2 text-sm break-all">{filename} — {sheet.rows.length} عضوية صالحة</span>
