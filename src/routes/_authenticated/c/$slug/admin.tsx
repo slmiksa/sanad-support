@@ -98,7 +98,7 @@ function CompanyAdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("tickets");
-  // فني الدعم داخل الشركة يرى التذاكر فقط — بدون تقارير أو إعدادات أو عضويات
+  // الدعم الفني داخل الشركة يرى التذاكر فقط — بدون تقارير أو إعدادات أو عضويات
   const canManage = access.isSuperAdmin || access.role === "company_admin";
   useEffect(() => {
     if (!canManage && tab !== "tickets") setTab("tickets");
@@ -1027,7 +1027,7 @@ function CompanyAdminPage() {
                   }
                 >
                   <option value="employee">موظف (يرفع تذاكر)</option>
-                  <option value="agent">فني دعم</option>
+                  <option value="agent">الدعم الفني</option>
                   <option value="company_admin">مشرف لوحة التحكم</option>
                 </select>
                 <button
@@ -1056,7 +1056,7 @@ function CompanyAdminPage() {
               />
               <MembersSection
                 title="فريق الدعم الفني"
-                hint="فنيو الدعم داخل الشركة — يستعرضون التذاكر ويردون عليها."
+                hint="عضويات الدعم الفني داخل الشركة — يستعرضون التذاكر ويردون عليها."
                 rows={(members.data ?? []).filter((m) => m.role === "agent")}
               />
             </div>

@@ -806,10 +806,10 @@ function downloadText(filename: string, content: string) {
 
 const ROLE_LABEL: Record<string, string> = {
   company_admin: "أدمن الشركة",
-  agent: "فني دعم",
+  agent: "الدعم الفني",
   employee: "موظف",
   super_admin: "أدمن المنصة",
-  platform_agent: "فني دعم المنصة",
+  platform_agent: "الدعم الفني للمنصة",
 };
 
 function F({ label, children }: { label: string; children: React.ReactNode }) {
