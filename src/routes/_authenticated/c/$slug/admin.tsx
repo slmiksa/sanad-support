@@ -98,7 +98,7 @@ function CompanyAdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("tickets");
-  // فني الدعم داخل الشركة يرى التذاكر فقط — بدون تقارير أو إعدادات أو عضويات
+  // الدعم الفني داخل الشركة يرى التذاكر فقط — بدون تقارير أو إعدادات أو عضويات
   const canManage = access.isSuperAdmin || access.role === "company_admin";
   useEffect(() => {
     if (!canManage && tab !== "tickets") setTab("tickets");
